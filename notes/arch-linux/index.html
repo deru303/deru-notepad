@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="../../css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <title>Arch (Artix) Linux - kompletna konfiguracja</title>
+</head>
+<body>
+    <div class="container" id="main-container">
+        <section id="section-main-header" class="top-level-section">
+            <header id="main-header">
+                <h1 id="main-header-heading" class="section-header">
+                    Arch (Artix) Linux - kompletna konfiguracja
+                </h1>
+                <h2>Wykonano przez: Daniel Rogowski</h2>
+    
+                <p id="main-header-preface" class="section-description">
+                    <p>W poniższym dokumencie znajdziesz kompletny poradnik poinstalacyjnej konfiguracji systemu Arch (Artix) Linux.</p>
+                    <p>Poniższy poradnik przedstawi krok po kroku jak zainstalować funkcjonalne środowisko graficzne, jak konfigurować i używać poszczególne programy oraz jak włączyć podstawowe, niezbędne usługi systemowe.</p>
+                </p>
+            </header>
+        </section>
+
+        <section id="section-requirements" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">Założenia</h1>
+                <p class="section-description">
+                    Niniejszy poradnik zakłada, że:
+                </p>
+            </header>
+
+            <ul>
+                <li>Wykonałeś podstawową instalację systemu Arch (Artix) Linux na podstawie instrukcji opisanych na Arch (Artix) Wiki</li>
+                <li>Twój system poprawnie się uruchamia i bootuje do środowiska tekstowego</li>
+            </ul>
+        </section>
+
+        <section id="section-explanation" class="top-level-section">
+            <h1 class="section-heading">Wyjaśnienie niektórych symboli:</h1>
+            <ul>
+                <li><span class="badge bg-success">Tylko dla: runit</span> - oznacza, że ten paragraf ma zastosowanie wyłacznie w przypadku używania określonego init systemu</li>
+                <li><span class="badge bg-primary">Odsyłacz: Docker</span> - oznacza, że temat zawarty w tym paragrafie jest szerzej opisany w innym dokumencie</li>
+                <li><span class="badge bg-secondary">Pliki: 3-1-Xorg</span> - oznacza, że do tego paragrafu są dołączone dodatkowe pliki, np. z konfiguracją omawianej usługi</li>
+                <li><code># uruchom usługę: NetworkManager</code> - uruchom wymienionego demona przy użyciu mechanizmów wbudowanych w twój init system</li>
+            </ul>
+        </section>
+
+        <section id="section-basic-tools" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">1. Podstawowe narzędzia</h1>
+                <p class="section-description">
+                    W tej sekcji dowiesz się, jak zainstalować najbardziej podstawowe narzędzia konsolowe, które będą niezbędne w dalszej konfiguracji oraz pracy z systemem.
+                </p>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">1.1. Program sudo</h2>
+                
+                <section class="subsection">
+                    <h3 class="subsection-heading">1.1.1. Instalacja programu sudo</h3>
+
+                    <p>Program <strong>sudo</strong> umożliwia wykonywanie poleceń konta <strong>root</strong> bez potrzeby przelogowywania się. </p>
+                    <p>Duża część programów zakłada obecność <strong>sudo</strong>, więc jego instalacja jest praktycznie wymagana.</p>
+                    <p><code>
+                        pacman -S base-devel<br/>
+                        usermod -a -G wheel daniel
+                    </code></p>
+                    <p>Po wykonaniu powyższych poleceń, należy przejść do pliku <strong>/etc/sudoers</strong> i odkomentować linijkę:</p>
+                    <p><code>
+                        %wheel ALL=(ALL) ALL
+                    </code></p>
+                </section>
+
+                <section class="subsection">
+                    <h3 class="subsection-heading">1.1.2. Dodatkowe reguły dla runit</h3>
+
+                    <p>Runit nie pozwala innym użytkownikom niż root na wyłączanie i reebotowanie systemu.</p>
+                    <p>Aby temu zaradzić, należy dodać do /etc/sudoers linijkę umożliwiającą wykonywanie m.in. instrukcji <strong>shutdown</strong> i <strong>rebot</strong>.</p>
+                    <p><code>
+                        # Allows all users to run shutdown/reboot/sleep commands without password<br/>
+                        ALL ALL=NOPASSWD: /sbin/poweroff, /sbin/shutdown, /sbin/reboot /sbin/halt
+                    </code></p>
+                    <p>Po dodaniu tej linijki, aby wyłączyć komputer wystarczy użyć polecenia <strong>sudo shutdown now</strong>.</p>
+                </section>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">1.2. Naprawa długiego czasu wyłączania systemu</h2>
+                <span class="badge bg-success">Tylko dla: systemd</span>
+
+                <p>W celu naprawy nieznośnie długiego czasu wyłączania systemu, należy edytować plik <strong>/etc/systemd/system.conf</strong></p>
+                <p><code>
+                    sudo vim /etc/systemd/system.conf
+                </code></p>
+                <p>i podmienić linijkę <code>DefaultTimeoutStopSec=90s</code> na <code>DefaultTimeoutStopSec=5s</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">1.3. Powłoki systemowe</h2>
+                <p>Domyślną powłoką w Arch Linuxie jest <strong>bash</strong>, ale my podmienimy go na <strong>zsh</strong>.</p>
+                <p>Oprócz tego, zainstalujemy bardzo minimalistyczną powłokę <strong>dash</strong> i podlinkujemy pod <strong>/bin/sh</strong>.</p>
+                <p><code>
+                    sudo pacman -S dash zsh<br/>
+                    sudo rm /bin/sh<br/>
+                    sudo ln -s /bin/dash /bin/sh<br/>
+                    mkdir -p ~/.cache/zsh<br/>
+                    sudo mkdir -p /root/.cache/zsh
+                </code></p>
+                <p>Po zainstalowaniu <strong>zsh</strong>, należy przejść do pliku <strong>/etc/passwd</strong> i podmienić powłokę logowania użytkownikowi root oraz zwykłemu użytkownikowi na <strong>/bin/zsh</strong>.</p>
+                <p>Pliki odpowiedzialne za konfigurację powłoki <strong>zsh</strong> skopiujesz w <strong>punkcie 3</strong> poradnika.</p>
+                <p>Po dokonaniu tych zmian możemy usunąć pliki związane z bashem.</p>
+                <p><code>
+                    rm -rf ~/.bash*<br/>
+                    sudo rm -rf /root/.bash*
+                </code></p>
+                <p>Samego basha oczywiście nie kasujemy z systemu, bo mnóstwo skryptów wymaga, aby był on obecny.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">1.4. Wrapper AUR</h2>
+                <p>Do instalowania programów z repozytorium społecznościowgo użyjemy wrappera <strong>yay</strong>.</p>
+                <p><code>
+                    pacman -S base-devel git --needed<br/>
+                    cd ~/Pobrane<br/>
+                    git clone https://aur.archlinux.org/yay-bin.git<br/>
+                    cd yay-bin<br/>
+                    makepkg -sir
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">1.5. Spolszczenie katalogów domowych</h2>
+                <p>Do zarządzania katalogami domowymi, użyjemy narzędzia <strong>xdg-user-dirs</strong>.</p>
+                <p><code>
+                    pacman -S xdg-user-dirs<br/>
+                    xdg-user-dirs-update
+                </code></p>
+                <p>Użycie powyższej komendy spowoduje utworzenie podstawowych folderów w katalogu domowym użytkownika.</p>
+                <p>Komenda ta jest wywoływana automatycznie w momencie logowania przez plik .zprofile, który skopiujesz w <strong>punkcie 3</strong> poradnika.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">1.6. Kolorowy Pacman</h2>
+                <p>W pliku <strong>/etc/pacman.conf</strong> należy odkomentować flagę Color.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">1.7. Zarządzanie archiwami</h2>
+                <p>W następnych krokach będziemy potrzebowali kilku prostych pakietów do zarządzania archiwami.</p>
+                <p><code>
+                    yay -S p7zip rar zip unzip
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">1.8. Konwersja plików graficznych</h2>
+                <p>Aby zmieniać rozszerzenia plików graficznych można użyć komendy <strong>convert</strong> z pakietu <strong>imagemagick</strong>.</p>
+                <p><code>
+                    sudo pacman -S imagemagick<br/>
+                    convert plik.jpg plik.png
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">1.9. Konwersja plików wideo</h2>
+                <p>Aby zmieniać rozszerzenia plików wideo można użyć komendy <strong>ffmpeg</strong>.</p>
+                <p><code>
+                    sudo pacman -S ffmpeg<br/>
+                    ffmpeg -i avifile.avi -sameq output.mpg # sameq - same quality
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">1.10. Wymuszenie kolejności uruchamiania demonów</h2>
+                <span class="badge bg-success">Tylko dla: runit</span>
+
+                <p>Init system <strong>runit</strong> nie dba domyślnie o to, aby usługi były uruchamiane w jakiejś określonej kolejności.</p>
+                <p>Dla przykładu: aby wymusić, aby usługa vsftpd uruchamiała się dopiero po usłudze NetworkManager, należy edytować plik <strong>/etc/runit/sv/vsftpd/run</strong> i na górze tegoż pliku zamieścić komendę <code>sv check NetworkManager > /dev/null || exit 1</code>.</p>
+                <p>Taką samą komendę można umieścić w pliku <strong>run</strong> każdego demona, aby mieć pewność, że w momencie jego uruchomienia będzie miał dostęp do zasobów sieciowych.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">1.11. Instalacja i uruchamianie usług</h2>
+                <span class="badge bg-success">Tylko dla: runit, openrc, s6</span>
+
+                <p>W dalszych częściach poradnika często znajdują się prośby o zainstalowanie paczki z jakimś demonem, na przykład <code>sudo pacman -S docker</code>.</p>
+                <p>W przypadku, gdy używamy init systemu innego niż systemd, oprócz takiej paczki należy doinstalować paczkę właściwą dla danego init systemu, na przykład <code>sudo pacman -S docker-runit</code> dla init systemu <strong>runit</strong>.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">1.12. Cichy start systemu operacyjnego</h2>
+                <span class="badge bg-success">Tylko dla: runit, openrc, s6</span>
+
+                <p>Niektóre init systemy mogą podczas rozruchu drukować dużo nadmiarowych informacji do wyjścia standardowego.</p>
+                <p>Aby przekierować te informacje do innego tty, należy edytować plik <strong>/etc/default/grub</strong>.</p>
+                <p>Następnie należy w nim wyszukać linijkę <strong>GRUB_CMDLINE_LINUX_DEFAULT</strong> i jako jeden z argumentów dla jądra dopisać <strong>vga=current console=tty2</strong></p>
+                <p>Po wykonaniu tej operacji należy jeszcze wywołać polecenie <code>grub-mkconfig -o /boot/grub/grub.cfg</code> i wszystko powinno być już gotowe.</p>
+            </section>
+
+        </section>
+
+        <section id="section-graphic-files" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">2. Niestandardowe pliki graficzne</h1>
+                <p class="section-description">W tej krótkiej sekcji pobierzesz i zainstalujesz niestandardowe tapety, które będą Ci potrzebne w trakcie konfigurowania środowiska graficznego.</p>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">2.1. Paczka tapet</h2>
+                <span class="badge bg-secondary"><a href="files/2-1-Tapety/" target=_blank>Pliki: 2-1-Tapety</a></span>
+                <p>Pobierz powyższe tapety i umieść w folderze <strong>/usr/share/wallpapers</strong></p>
+                <p>Tapety te są używane przez plik <strong>.xinitrc</strong> (skopiujesz go w następnym rozdziale).</p>
+                <p>Prawdopodobnie folder <strong>/usr/share/wallpapers</strong> nie będzie istniał i będziesz musiał go utworzyć.</p>
+            </section>
+        </section>
+
+        <section id="section-user-dotfiles" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">3. Pliki użytkownika</h1>
+                <p class="section-description">W tej sekcji pobierzesz i skopiujesz do katalogu domowego podstawowe pliki z konfiguracją i różnymi niezbędnymi skryptami.</p>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">3.1. Pliki serwera xorg</h2>
+                <span class="badge bg-secondary"><a href="files/3-1-Xorg/" target=_blank>Pliki: 3-1-Xorg</a></span>
+
+                <p>Folder dołączony do tego podpunktu zawiera dwa pliki: <strong>.Xresources</strong> oraz <strong>.xinitrc</strong>.</p>
+                <p>Ten pierwszy odpowiada za wygląd niektórych aplikacji graficznych, a drugi uruchamia menedżer okien dwm wraz z niektórymi niezbędnymi usługami.</p>
+                <p>Stwórz folder dla tych plików poleceniem <code>mkdir -p $HOME/.config/X11</code> i skopiuj do niego wspomniane pliki.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">3.2. Pliki powłoki zsh</h2>
+                <span class="badge bg-secondary"><a href="files/3-2-Zsh/" target=_blank>Pliki: 3-2-Zsh</a></span>
+
+                <p>Plik <strong>.zshenv</strong> należy skopiować do katalogu domowego użytkownika. Zawiera on wartości dla niektórych zmiennych środowiskowych, w tym zmiennych określających, gdzie zsh ma szukać swojej konfiguracji.</p>
+                <p>Resztę plików należy skopiować do uprzednio utworzonego katalogu <strong>~/.config/zsh</strong>.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">3.3. Uniwersalne pliki powłoki</h2>
+                <span class="badge bg-secondary"><a href="files/3-3-ShellConfig/" target=_blank>Pliki: 3-3-ShellConfig</a></span>
+
+                <p>Plik aliasrc należy skopiować do katalogu .config/shell.</p>
+                <p>Plik jest automatycznie dołączany przez .zshrc i zawiera podstawowe aliasy dla powłoki systemowej.</p>
+            </section>
+    
+            <section class="subsection">
+                <h2 class="subsection-heading">3.4. Folder .local/bin</h2>
+                <span class="badge bg-secondary"><a href="files/3-4-LocalBin/" target=_blank>Pliki: 3-4-LocalBin</a></span>
+
+                <p>Folder .local/bin zawiera wszystkie skrypty użytkownika, w tym ważne skrypty odpowiedzialne za elementy wyświetlające się na pasku statusu.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">3.5. Konto root</h2>
+                <p>Wszystkie wymienione w tym punkcie pliki warto skopiować także użytkownikowi root, aby i on mógł zastosować się do ich konfiguracji.</p>
+            </section>
+        </section>
+
+        <section id="section-networking" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">4. Sieć</h1>
+                <p class="section-description">W tej sekcji skonfigurujesz dostęp twojego komputera do sieci.</p>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">4.1. NetworkManager</h2>
+                <p>Do zarządzania siecią przewodową i bezprzewodową, będziemy używać pakietu <strong>networkmanager</strong>. Będzie to nasz główny demon służący do zarządzania połączeniami.</p>
+                <p><code>
+                    sudo pacman -S networkmanager<br/>
+                    # uruchom usługę: NetworkManager
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">4.2. Łączenie z siecią bezprzewodową</h2>
+
+                <p>Do łączenia się z siecią bezprzewodową można użyć konsolowego programu <strong>nmtui</strong>, bardzo czytelnego edytora opartego na bibliotece ncurses.</p>
+                <p>Ten sam program pozwala na między innymi łatwe edytowanie adresu IP komputera.</p>
+            </section>
+        </section>
+
+        <section id="section-networking-services" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">5. Usługi sieciowe</h1>
+                <p class="section-description">W tej sekcji dowiesz się jak skonfigurować zaporę sieciową oraz podstawowe usługi sieciowe, takie jak SSH czy Samba.</p>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">5.1. Zapora sieciowa</h2>
+                <p>
+                    Zaporą, która będzie chroniła nasz komputer, będzie iptables. Iptables jest domyślną paczką zainstalowaną na każdym Arch Linuxie, ale ponieważ my używamy Artixa, musimy doinstalować odpowiedni skrypt dla runit.
+                </p>
+                <p><code>
+                    sudo systemctl enable --now iptables<br/>
+                </code></p>
+                <p>
+                    Skrypt firewall.py w katalogu użytkownika zawiera gotową konfigurację zapory dla wszystkich opisanych w tym dokumencie usług. Wystarczy go tylko uruchomić.
+                    Skrypt ten obsługuje zarówno kontenery Dockera, jak i usługi zainstalowane bezpośrednio w systemie operacyjnym.
+                </p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">5.2. Serwer MiniDLNA</h2>
+                <p>
+                    Serwer działa na publicznym porcie 8200.
+                </p>
+                <p>
+                    MiniDLNA jest prostym serwerem multimediów, który umożliwia łatwe strumieniowanie zdjęć, filmów i muzyki na dowolne inne urządzenie.
+                </p>
+                <p><code>
+                    sudo pacman -S minidlna<br/>
+                    sudo mkdir /srv/dlna<br/>
+                    sudo groupadd media<br/>
+                    sudo chown root:media /srv/dlna<br/>
+                    sudo chmod 775 /srv/dlna<br/>
+                </code></p>
+                <p>
+                    Każdemu użytkownikowi, który ma mieć możliwość edytowania folderu z mediami, należy przypisać grupę media.
+                </p>
+                <p><code>
+                    sudo usermod -a -G media daniel
+                </code></p>
+                <p>
+                    Aby DLNA działało poprawnie, należy edytować plik /etc/minidlna.conf i umiescić tam linijkę linijkę <strong>media_dir=/srv/dlna</strong>.
+                </p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">5.3. FTP</h2>
+                <span class="badge bg-secondary"><a href="files/5-3-Ftp" target=_blank>Pliki: 5-3-Ftp</a></span>
+
+                <p>
+                    Serwer działa na chronionych portach 20, 21 oraz w przedziale 10090:10100 dla trybu pasywnego.
+                </p>
+                <p><code>
+                    sudo pacman -S vsftpd<br/>
+                    # uruchom usługę: vsftpd
+                </code></p>
+                <p>
+                    Dodatkowo będziemy musieli wygenerować klucz SSL, ktory posłuży do szyfrowania połączenia z naszym serwerem:
+                </p>
+                <p><code>
+                    cd /etc/ssl/certs<br/>
+                    sudo openssl req -x509 -nodes -days 7300 -newkey rsa:2048 -keyout vsftpd.pem -out vsftpd.pem<br/>
+                    chmod 600 vsftpd.pem
+                </code></p>
+                <p>Plik <strong>vsftpd.conf</strong> dołączony do tego podpunktu należy umieścić bezpośrednio w katalogu <strong>/etc</strong>.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">5.4. Serwer SSH</h2>
+                <p>Serwer działa na chronionym porcie 22.</p>
+                <p>Serwer SSH przyda się do zdalnego używania terminala tekstowego. Można go zainstalować poleceniem:</p>
+                <p><code>
+                    sudo pacman -S openssh<br/>
+                    # uruchom usługę: sshd
+                </code></p>
+                <p>Serwer jest poprawnie skonfigurowany od razu po zainstalowaniu i nie trzeba go dodatkowo konfigurować.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">5.5. Serwer VNC</h2>
+                <p>Serwer działa na chronionym porcie 5900.</p>
+                <p>Serwer VNC umożliwia zdalny dostęp do fizycznego ekranu komputera. Zainstalujesz go poleceniem:</p>
+                <p><code>
+                    sudo pacman -S x11vnc
+                </code></p>
+                <p>Aby uruchomić serwer VNC dla aktualnie zalogowanego użytkownika, wydaj komendę:</p>
+                <p><code>
+                    x11vnc -pass haslodoserwera -loop
+                </code></p>
+            </section>
+        </section>
+
+        <section id="section-docker" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">6. Docker</h1>
+                <p class="section-description">W tej sekcji dowiesz się jak skonfigurować narzędzie do konteneryzacji - Dockera.</p>
+                <span class="badge bg-primary"><a href="../docker/index.html" target="_blank">Odsyłacz: Docker</a></span>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">6.1. Pacman hook</h2>
+                <span class="badge bg-success">Tylko dla: systemd</span>
+                <span class="badge bg-secondary"><a href="files/6-1-DockerPacmanHook/" target=_blank>Pliki: 6-1-DockerPacmanHook</a></span>
+
+                <p>Przed zainstalowaniem Dockera pobierz dołączone do tego podpunktu pliki i umieść w katalogu /etc/pacman.d/hooks. Jeżeli katalog ten nie istnieje, utwórz go.</p>
+                <p>Pliki zawierają specjalne instrukcje dla Pacmana, które naprawiają problem z długim oczekiwaniem na wyłączenie komputera, gdy zainstalujemy i włączymy Dockera wraz z containerd. Instrukcje te uruchamiają się za każdym razem, gdy użytkownik zainstaluje lub zaktualizuje dockera lub containerd.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">6.2. Instalacja Dockera</h2>
+
+                <p>Dockera dla systemu Arch Linux zainstalujesz przez użycie następujących komend:</p>
+                <p><code>
+                    sudo pacman -S docker<br/>
+                    sudo pip install docker-compose <br />
+                    # uruchom usługę: docker
+                    sudo usermod -a -G docker daniel<br/>
+                    docker run hello-world
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">6.3. LAMPP stack</h2>
+                <span class="badge bg-secondary"><a href="files/6-3-DockerLampp" target=_blank>Pliki: 6-3-DockerLampp</a></span>
+
+                <p>Paczka docker-compose zawierająca zestaw Apache + PHP + MySQL + Phpmyadmin</p>
+                <p>Usługi te będą uruchomione kolejno na portach 8080 (Apache), 5000 (Phpmyadmin) oraz 9075 (MySQL). Są to porty komputera-hosta. Skrypt firewall.py w katalogu .scripts zawiera odpowiednie reguły, które ograniczają dostęp do tych kontenerów.</p>
+                <p><code>
+                    mkdir -p ~/Programowanie/LampStack<br/> 
+                    unzip lamp-docker-stack-by-deru.zip<br/>
+                    docker-compose up -d
+                </code></p>
+            </section>
+        </section>
+
+        <section id="section-printing" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">7. Drukowanie</h1>
+                <p class="section-description">W tej sekcji skonfigurujesz demona cups - usługę odpowiedzialną za obsługę drukarek.</p>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">7.1. Instalacja demona cups</h2>
+                <p>Do obsługi drukowania, będzie nam potrzebny działający demon cups:</p>
+                <p><code>
+                    pacman -S cups<br/>
+                    # uruchom usługę: cupsd
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">7.2. Dodawanie nowych drukarek, zmiana ustawień</h2>
+                <p>Cups wystawia swój własny interfejs sieciowy, który znajdziesz pod adresem <strong>localhost:631</strong>. Można tam między innymi dodawać nowe drukarki i zmieniać ustawienia dla istniejących.</p>
+                <p>Przy dodawaniu drukarki Cups poprosi użytkownika o zaznaczenie protokołu sieciowego. Zazwyczaj powinno to być <strong>AppSocket/HP JetDirect</strong>.</p>
+            </section>
+        </section>
+
+        <section id="section-sound" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">8. Dźwięk</h1>
+                <p class="section-description">W tej sekcji skonfigurujesz demona PulseAudio - usługę odpowiedzialną za obsługę dźwięku.</p>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">8.1. Instalacja demona PulseAudio</h2>
+                <p>Do obsługi dźwięku w systemie operacyjnym, będzie nam potrzebny działający demon PulseAudio:</p>
+                <p><code>
+                    pacman -S pulseaudio pamixer<br/>
+                </code></p>
+                <p>Paczka <strong>pulseaudio</strong> zawiera samego demona dźwięku. Pakiet <strong>pamixer</strong> jest używany przez skrypty statusu do wyświetlania obecnego stanu dźwięku na pasku.</p>
+                <p>Demon pulseaudio jest uruchamiany przez plik .xinitrc w momencie startowania środowiska graficznego.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">8.2. Mikser ncurses</h2>
+                <p>Do łatwej zmiany głośności źródeł dźwięku można użyć konsolowego miksera opartego na ncurses, programu <strong>ncpamixer</strong>.</p>
+                <p><code>
+                    yay -S ncpamixer<br/>
+                    # pacman -S pulsemixer (wcześniej używany)
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">8.3. Jak zarządzać dźwiękiem?</h2>
+                <p>Do prostej zmiany głośności można użyć bindów zapisanych w konfiguracji dwm, jak Win+P oraz Win+O.</p>
+                <p>Do bardziej skomplikowanych działań należy użyć polecenia <strong>ncpamixer</strong>.</p>
+                <p>Jeśli koniecznie istnieje taka potrzeba, można użyć graficznego konfiguratora <strong>pavucontrol</strong>.</p>
+            </section>
+        </section>
+
+        <section id="section-graphical-environment" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">9. Podstawowe środowisko graficzne</h1>
+                <p class="section-description">W tej sekcji skonfigurujesz menedżera okien dwm wraz z innymi, podstawowymi usługami graficznymi.</p>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">9.1. Serwer xorg</h2>
+                <p>Aby tryb graficzny działał poprawnie, będziemy potrzebowali kilku pakietów z repozytorium Arch Linuxa:</p>
+                <p><code>
+                    pacman -S xorg-server xorg-xinput xorg-setxkbmap xorg-xinit xwallpaper mesa --needed
+                </code></p>
+                <p>
+                    Pakiet xorg-server to podstawowe narzędzia wymagane do działania serwera grafiki.
+                    Pakiet xorg-xinput jest niezbędny do prawidłowego skonfigurowania touchpada.
+                    Pakiet xorg-setxkbmap umożliwia remapowanie poszczególnych klawiszy.
+                    Pakiet xorg-xinit służy do uruchamiania środowiska graficznego bez użycia display managera.
+                    Pakiet xwallpaper umożliwia ustawianie  tapety.
+                    Pakiet mesa to implementacja sterownika OpenGL.
+                </p>
+            </section>
+    
+            <section class="subsection">
+                <h2 class="subsection-heading">9.2. Programy do samodzielnej kompilacji</h2>
+                <span class="badge bg-secondary"><a href="files/9-2-SucklessStack/" target=_blank>Pliki: 9-2-SucklessStack</a></span>
+
+                <p>Teraz zainstalujemy menedżer okien dwm razem z innymi narzędziami do samodzielnej kompilacji.</p>
+
+                <p>
+                    Foldery dołączone do tego podpunktu kopiujemy do <strong>~/.local/src</strong>.
+                    Na każdym z folderów należy wywołać polecenie <code>sudo make install</code>.
+                </p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">9.3. Picom</h2>
+                <span class="badge bg-secondary"><a href="files/9-3-Picom/" target=_blank>Pliki: 9-3-Picom</a></span>
+
+                <p>Aby środowisko wyświetlało płynne animacje przejścia i wspierało przezroczystość, doinstalowujemy paczkę picom:</p>
+                <p><code>
+                    sudo pacman -S picom
+                </code></p>
+                <p>Konfigurację dla programu (załączoną do tego podpunktu) zamieść bezpośrednio w katalogu <strong>.config</strong> użytkownika.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">9.4. Rofi</h2>
+                <span class="badge bg-secondary"><a href="files/9-4-Rofi/" target=_blank>Pliki: 9-4-Rofi</a></span>
+
+                <p>Następnie pobieramy program rofi, czyli główną komendę do wyświetlania różnych menu.
+                <p>Pamiętaj o skopiowaniu skoórki <strong>onedark.rasi</strong> do katalogu <strong>~/.config/rofi</strong>.</p>
+                <p><code>
+                    sudo pacman -S rofi
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">9.4. Emoji</h2>
+
+                <p>Aby działało wybieranie emoji, musimy doinstalować paczki xdotool i xsel oraz wywołać skrypt rofi-emoji.sh z opcją download.</p>
+                <p><code>
+                    sudo pacman -S xdotool xsel<br/>
+                    rofi-emoji.sh --download
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">9.5. Kontrola jasności</h2>
+
+                <p>Do kontroli jasności ekranu użyjemy paczki xorg-xbacklight. Oprócz tego, będziemy potrzebować sterownika Intel, aby system prawidlowo wykrywał podświetlenie ekranu.</p>
+                <p><code>
+                    sudo pacman -S xorg-xbacklight xf86-video-intel
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">9.6. Tworzenie screenshotów</h2>
+
+                <p>Tworzenie screenshotów przez wciśnięcie klawisza PrintScreen obsłuży dla nas autorski skrypt rofi-screenshot.sh. Wymaga on zainstalowania paru paczek:</p>
+                <p><code>
+                    yay -S xclip slop ffcast imagemagick --needed 
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">9.7. Polkit</h2>
+
+                <p>Będziemy też potrzebować tak zwanego polkita, którego zadaniem jest graficzne uwierzytelnianie użytkownika.</p>
+                <p><code>
+                    sudo pacman -S mate-polkit
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">9.8. Powiadomienia</h2>
+
+                <p>Niektóre aplikacje korzystają z powiadomień systemowych do wyświetlania pewnych danych użytkownikowi. Żeby takie powiadomienia działały, należy doinstalować paczkę notify-osd.</p>
+                <p><code>
+                    sudo pacman -S notify-osd<br/>
+                    notify-send "Testowe powiadomienie."
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">9.9. Inne potrzebne paczki</h2>
+
+                <p>Kombinacje klawiszy wyszczególnione w konfiguracji dwm wymagają do działania polecenia wmctrl. Zainstaluj je komendą:</p>
+                <p><code>
+                    sudo pacman -S wmctrl<br/>
+                </code></p>
+            </section>
+        </section>
+
+        <section id="section-themes" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">10. Wygląd, motywy, ikony</h1>
+                <p class="section-description">W tej sekcji pobierzesz motywy GTK oraz paczkę ikon - dzięki temu system będzie wyglądał ładniej i nowoczesniej.</p>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">10.1. Paczka ikon</h2>
+                <p>
+                    Jako paczki ikon, wykorzystamy popularnej paczki Papirus. Możesz ją zainstalować bezpośrednio przez menedżer pakietów.
+                </p>
+                <p><code>sudo pacman -S papirus-icon-theme</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">10.2. Motyw GTK</h2>
+                <p>
+                    Jako motyw GTK, wykorzystamy motyw <strong>Arc Lighter</strong> z paczki <strong>arc-gtk-theme</strong>.
+                </p>
+                <p><code>sudo pacman -S arc-gtk-theme</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">10.3. Kursor</h2>
+                <p>Jako kursor w zupełności wystarczy ten domyślny.</p>
+                <p>Jeżeli chcemy, by zamiast domyślnego czarnego nasz kursor był biały, możemy zainstalować ładny biały kursor poniższą komendą:</p>
+                <p><code>yay -s xcursor-human</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">10.4. Jak użyć zainstalowanych ikon i motywów?</h2>
+                <p>Do zmiany motywów, ikon i kursorów można użyć graficznego edytora <strong>lxappearance</strong>.</p>
+                <p>Ma on tylko dwie zależności i można go skasować od razu po tym, jak wybraliśmy odpowiedni motyw.</p>
+                <p><code>
+                    sudo pacman -S lxappearance<br/>
+                    lxappearance<br/>
+                    sudo pacman -Rsn lxappearance
+                </code></p>
+            </section>
+        </section>
+
+        <section id="section-fonts" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">11. Podstawowe czcionki</h1>
+                <p class="section-description">W tej sekcji pobierzesz podstawowe, niezbędne czcionki.</p>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">11.1. Czcionki Microsoftu</h2>
+                <p>Czcionki z Windowsa, potrzebne do prawidłowego wyświetlania większości stron internetowych.</p>
+                <p><code>yay -S ttf-ms-fonts ttf-windows</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">11.2. Emoji</h2>
+                <p>Czcionki i narzędzia wymagane do prawidłowego wyświetlania emoji, w tym do wyświetlania emoji w terminalu st.</p>
+                <p><code>yay -S noto-fonts-emoji libxft-bgra ttf-joypixels</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">11.3. Czcionki do paska i3bar</h2>
+                <p><code>yay -S cantarell-fonts ttf-nerd-fonts-symbols</code></p>
+                <p>Czcionka <strong>Cantarell Extra Bold</strong> jest wykorzystywana do wyświetlania tekstu, 
+                a <strong>Nerd Fonts Symbols</strong> do wyświetlania symboli.</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">11.4. Czcionka do terminala</h2>
+                <p>Czcionka <strong>MesloLGL Nerd Font</strong>, wykorzystywana w terminalu.</p>
+                <p><i>Zainstalować tylko, jeżeli w systemie na pewno jej jeszcze nie ma.</i></p>
+                <p><code>yay -S nerd-fonts-meslo</code></p>
+            </section>
+        </section>
+
+        <section id="section-programming-tools" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">12. Narzędzia programistyczne, języki programowania</h1>
+                <p class="section-description">W tej sekcji pobierzesz wszystkie niezbędne konsolowe narzędzia związane z programowaniem.</p>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">12.1. Python</h2>
+                <span class="badge bg-primary"><a href="../python/" target="_blank">Odsyłacz: Python</a></span>
+                <p><code>
+                    sudo pacman -S python python-pip
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">12.2. PHP</h2>
+                <p><code>
+                    sudo pacman -S php
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">12.3. Java</h2>
+                <p><code>
+                    sudo pacman -S java-openjfx java-runtime-common<br/>
+                </code></p>
+            </section>
+        </section>
+
+        <section id="section-programs" class="top-level-section">
+            <header class="section-header">
+                <h1 class="section-heading">13. Programy użytkowe</h1>
+                <p class="section-description">W tej sekcji pobierzesz programy, z których będziesz korzystał.</p>
+            </header>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.1. Edytor tekstu</h2>
+                <span class="badge bg-secondary"><a href="files/13-1-TextEditors/" target=_blank>Pliki: 13-1-TextEditors</a></span>
+                <span class="badge bg-primary"><a href="../vim/index.html" target="_blank">Odsyłacz: Vim</a></span>
+
+                <p>Do prostej edycji plików tekstowych użyjemy konsolowego programu <strong>neovim</strong>.</p>
+                <p>Jako zwykły, prosty systemowy notatnik można zainstalować program <strong>mousepad</strong></p>
+                <p>Do bardziej skomplikowanych zadań przyda się <strong>Visual Studio Code</strong>.</p>
+                <p><code>
+                    yay -S mousepad visual-studio-code-bin neovim<br/>
+                    ln -s /usr/bin/nvim /usr/bin/vim
+                </code></p>
+                <p>Do niniejszego podpunktu dołączone są dwa pliki: plik dla Visual Studio należy wkleić do konfiguracji JSON Visual Studio, natomiast plik init.vim musi leżeć w katalogu ~/.config/nvim</p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.2. Menedżer zadań</h2>
+                <p>Jako menedżera zadań użyjemy konsolowej aplikacji gotop.</p>
+                <p><code>
+                    yay -S gotop
+                </code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.3. Pakiet biurowy</h2>
+                <p>Do edytowania dokumentów wykorzystamy popularny pakiet biurowy LibreOffice.</p>
+                <p><code>pacman -S libreoffice-fresh libreoffice-fresh-pl</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.4. Menedżer plików</h2>
+
+                <div class="section-part">
+                    <p>Do zarządzania plikami w trybie graficznym, wykorzystamy program <strong>Thunar</strong> wraz z wtyczką do zarządzania archiwami i wtyczką do automatycznego montowania systemów plików.</p>
+                    <p>Paczka tumbler jest natomiast odpowiedzialna za wyświetlanie miniaturek.</p>
+                    <p><code>sudo pacman -S thunar thunar-volman thunar-archive-plugin tumbler</code></p>
+                </div>
+                
+                <div class="section-part">
+                    <p>W trybie konsolowym, naszym menedżerem plików będzie <strong>ranger</strong>. Dodatkowo należy doinstalować paczkę w3m, która pozwala rangerowi wyświetlać podgląd obrazków.</p>
+                    <p><code>sudo pacman -S w3m ranger</code></p>
+                    <p>Oprócz tego, należy skopiować plik <a href="files/rc.conf">rc.conf</a> do katalogu ~/.config/ranger.</p>
+                </div>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.5. Kalkulator</h2>
+                <p>Jako kalkulator, będziemy używać bardzo prostej konsolowej aplikacji o nazwie <strong>qalc</strong>.</p>
+                <p><code>sudo pacman -S libqalculate</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.6. Przeglądarka zdjęć</h2>
+
+                <div class="section-part">
+                    <p>Do przeglądania zdjęć użyjemy przeglądarki <strong>Viewnior</strong>.</p>
+                    <p><code>sudo pacman -S viewnior</code></p>
+                </div>
+
+                <div class="section-part">
+                    <p>W trybie konsolowym, jako przeglądarkę zdjęć będziemy używać <strong>sxiv</strong> - Simple X Image Viewer.</p>
+                    <p><code>sudo pacman -S sxiv</code></p>
+                </div>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.7. Odtwarzacz wideo</h2>
+
+                <div class="section-part">
+                    <p>Do odtwarzania plików filmowych użyjemy <strong>VLC Media Playera</strong>.</p>
+                    <p><code>sudo pacman -S vlc</code></p>
+                </div>
+
+                <div class="section-part">
+                    <p>W trybie konsolowym głównym odtwarzaczem będzie <strong>mpv</strong>.</p>
+                    <p><code>sudo pacman -S mpv</code></p>
+                </div>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.8. Odtwarzacz audio</h2>
+                <p>Naszym odtwarzaczem audio będzie <strong>Rhytmbox</strong>.</p>
+                <p><code>sudo pacman -S rhytmbox</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.9. Klient FTP</h2>
+                <p>Jako klienta FTP użyjemy autorskiego skryptu <strong>mnt-ftp.py</strong>.</p>
+                <p>Wymaga on zainstalowania paczki curlftpfs.</p>
+                <p><code>sudo pacman -S curlftpfs</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.10. Usługi streamingowe</h2>
+                <p>Jeśli chcesz, możesz też pobrać Spotify oraz Netflixa z repozytorium społecznościowego Archa.</p>
+                <p><code>yay -S spotify netflix-qdesktop</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.11. Obróbka dźwięku</h2>
+                <p>Do obróbki dźwięku można zainstalować <strong>Audacity</strong>.</p>
+                <p><code>sudo pacman -S audacity</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.12. Edytor graficzny</h2>
+                <p>Do edytowania plików graficznych najlepiej sprawdzi się <strong>GIMP</strong>.</p>
+                <p><code>sudo pacman -S gimp</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.13. Przeglądarka PDF</h2>
+                <p>Do przeglądania PDF użyjemy minimalistycznej aplikacji <strong>zathura</strong>.</p>
+                <p><code>sudo pacman -S zathura zathura-pdf-mupdf</code></p>
+            </section>
+
+            <section class="subsection">
+                <h2 class="subsection-heading">13.14. Przeglądarka internetowa</h2>
+                <p>Jako systemowej przeglądarki internetowej użyjemy Opery.</p>
+                <p><code>sudo pacman -S opera opera-ffmpeg-codecs</code></p>
+                <p>Pierwsza paczka zawiera samą przeglądarkę, a druga - zestaw kodeków do odtwarzania wideo.</p>
+            </section>
+        </section>
+    </div>
+</body>
+</html>

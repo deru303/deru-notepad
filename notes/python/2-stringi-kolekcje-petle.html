@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2. Stringi, kolekcje, pętle i iteratory</title>
+
+    <link rel="stylesheet" href="../../css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="resources/css/highlight.min.css">
+    <link rel="stylesheet" href="resources/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>2. Stringi, kolekcje, pętle i iteratory</h1>
+        <hr/>
+
+        <section class="code-section">
+            <h2>Cztery podstawowe kolekcje danych w Pythonie</h2>
+            <pre><code class="python">
+                # Klasa tuple (krotka)
+                my_tuple = (10, 20, 30)
+                my_tuple = 10, 20, 30
+                one_element_tuple = (10, )
+                my_tuple = tuple([10, 20, 30])  # konwersja listy na krotkę
+
+                # Klasa list (lista)
+                my_list = [10, 20, 30]
+                my_list = list((10, 20, 30))  # konwersja krotki na listę
+
+                # Klasa dict (słownik) 
+                my_dictionary = {
+                    "key": 123,
+                    "second-key": 321
+                }
+                my_dictionary = dict(key=123, secondkey=321)  # używa keyword args
+
+                # Klasa set
+                my_set = {10, 20, 20, 30}  # drugie 20 zostanie wykluczone, bo elementy nie mogą się powtarzać
+                my_set = set([10, 20, 30, 30])  # konwersja listy na set
+
+                # W przypadku funkcji list, tuple i set:
+                # Jeżeli argument nie będzie iterable, zostanie podniesiony TypeError.
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Typ tekstowy - str</h2>
+            <pre><code class="python">
+                # String w Pythonie jest traktowany tak, jak gdyby był kolekcją znaków, z których się składa
+                my_string = str("12345")
+                my_tuple = tuple(my_string)  # krotka ze znaków w stringu
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Operacje na stringach</h2>
+            <pre><code class="python">
+                # Łączenie
+                str_1 = "123" + "987"
+                str_1 = ''.join(["123", "987"])  # szybsze
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Len - pobieranie długości kolekcji</h2>
+            <pre><code class="python">
+                # Funkcja len umożliwia pobranie długości wskazanej kolekcji lub stringa
+                my_list = ["10", "20", "30"]
+                my_len = len(my_list)
+                print(my_len)  # drukuje długość listy, czyli 3
+
+                # Funkcja len tak naprawdę wywołuje metodę __len__(self) na danym obiekcie
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Składnia nawiasów kwadratowych [start:stop:step]</h2>
+            <pre><code class="python">
+                # Nawiasy kwadratowe umożliwiają pobranie wskazanego elementu (lub elementów) kolekcji
+
+                # Składnia jest następująca [pozycja_startowa:pozycja_końcowa:co_ile_pobierać]
+                # [start:stop:step]
+                # Przy czym start jest zaliczany do przedziału (jest included), a stop już nie jest (jest excluded)
+
+                coll[0]  # pobiera wskazany element (pierwszy)
+                coll[:5]  # nie podano startu, więc pobierze indeksy od 0 do 4 (5 już się nie wlicza)
+                coll[3:]  # nie podano stopu, więc pobierze indeksy od 3 do końca
+                coll[:]  # pobiera wszystkie elementy (tworzy kopię kolekcji)
+                coll[2:4]  # pobiera elementy o indeksach z przedziału &lt;2; 4)
+                coll[1:5:2]  # pobierze co drugi znak od 1 do 4
+                coll[::-1]  # odwrócenie, wzięcie wszystkich elementów od końca
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Operacje na kolekcjach</h2>
+            <pre><code class="python">
+                # Łączenie kolecji
+                new_list = [1, 2, 3] + [3, 2, 1]
+
+                # Mnożenie kolekcji
+                new_str = "123" * 3  # zwróci "123123123"
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Mechanizm odpakowania</h2>
+            <h3>Odpakowanie zwykłe, pozycyjne (operator *)</h3>
+            <pre><code class="python">
+                # Mamy przykładową funkcję, która zwraca sumę dwóch liczb przekazanych jako argument
+                def sample_func(x, y):
+                    return x + y
+
+                # Mamy kolekcję dwóch liczb
+                numbers = [10, 20]
+
+                # Aby przekazać liczby do funkcji, używamy gwiazdki, operatora odpakowania
+                sample_func(*numbers)  # to to samo, co sample_func(10, 20)
+            </code></pre>
+            <h3>Odpakowanie słownika (operator **)</h3>
+            <pre><code class="python">
+                # Przykładowa funkcja z argumentami x i y, wyświetla ich wartości
+                def sample_func(x, y):
+                    print("x value is", x, "y value is", y)
+
+                # Mamy słownik składający się z dwóch pozycji:
+                my_dict = {
+                    "y": 20,
+                    "x": 10
+                }
+
+                # Funkcja wyśle my_dict["y"] jako argument y i my_dict["x"] jako argument x
+                sample_func(**my_dict)
+            </code></pre>
+            <h3>Odpakowanie krotki do zmiennych</h3>
+            <pre><code class="python">
+                my_tuple = (10, 20, 30)
+                x, y, z = my_tuple  # x bedzie równe 10, y 20, a z bedzie równe 30
+
+                # W jednej linijce
+                xx, yy, zz = 10, 20, 30
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Wyszukiwanie - instrukcja in</h2>
+            <pre><code class="python">
+                # Instrukcja in działa na dowolnym obiekcie iterable
+                # Sprawdza, czy wskazana kolekcja zawiera wskazany element
+
+                string = "Thomas"
+                col = 10, 20, 30, 40
+                print("om" in string)  # True, "Thomas" zawiera "om"
+                print(50 in col)  # False, krotka nie zawiera wartości 50
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Usuwanie - instrukcja del</h2>
+            <pre><code class="python">
+                # Instrukcja del pozwala skasować dowolną zmienną, w tym pola klasy
+
+                x = "string"
+                del x
+                print(x)  # spowoduje wyjątek NameError
+
+                y = [10, 20, 30, 40]
+                del y[0]
+                print(*y)  # wyświetli 20 30 40
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Tuple (krotka) - podstawowe informacje</h2>
+            <ul>
+                <li>Krotka jest kolekcją immutable - nie można do niej dodać ani usunąć elementów; można jedynie nadpisać starą krotkę nową</li>
+                <li>Krotka zachowuje kolejność elementów w trakcie iteracji</li>
+            </ul>
+            <pre><code class="python">
+                my_tuple = 10, 20, 30, 40
+                print(my_tuple[0])  # wydrukuje 10
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>List (lista) - podstawowe informacje</h2>
+            <ul>
+                <li>Lista jest bardzo podobna w obsłudze do krotki, ale jest kolekcją mutable - może dynamicznie zmieniać liczbę elementów</li>
+                <li>Lista zachowuje kolejność elementów w trakcie iteracji</li>
+            </ul>
+
+            <pre><code class="python">
+                my_list = [10, 20, 30, "forty"]
+
+                y.insert(0, -10)  # wstawi wartość -10 na początek tablicy
+                y.append(5050)  # wstawi wartość 5050 na koniec tablicy
+                y.remove("forty")  # usunie element o wartości "forty"
+                y.pop()  # usunie ostatni element i go zwróci
+                del y[0]  # usunie element o indeksie 0
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Enumerate - iterowanie po tablicy z indeksami</h2>
+
+            <pre><code class="python">
+                # Funkcja enumerate podczas iterowania się po kolekcji, pozwala też pobierać indeks każdego elementu.
+
+                my_list = [10, 20, 30, "40"]
+
+                for index, element in enumerate(my_list):
+                    print("index", index, "element", element)
+            </code></pre> 
+        </section>
+    </div>
+    <script src="resources/js/highlight.min.js"></script>
+    <script src="resources/js/jquery.min.js"></script>
+    <script src="resources/js/normalize-indents.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>

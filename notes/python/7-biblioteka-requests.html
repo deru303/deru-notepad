@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7. Biblioteka requests</title>
+
+    <link rel="stylesheet" href="../../css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="resources/css/highlight.min.css">
+    <link rel="stylesheet" href="resources/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>7. Biblioteka requests</h1>
+        <hr/>
+
+        <section class="code-section">
+            <h2>Do czego służy biblioteka requests?</h2>
+            <p>Biblioteka requests zezwala na pobieranie zawartości z zewnętrznych stron WWW oraz na wykonywanie szeroko pojętych żądań HTTP.</p>
+            <p>Wszystkie poniższe bloki kodu źródłowego będą wymagały zainstalowania biblioteki oraz zaimportowania modułu:</p>
+            <pre><code class="python">
+                $ pip install requests
+
+                import requests
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Proste polecenie get z parametrami</h2>
+            <pre><code class="python">
+            try:
+                page = requests.GET (
+                    # Link do strony
+                    "https://adoptuj-krysia.github.io", 
+
+                    # Params to parametry doklejane do adresu URL po znaku zapytania
+                    # Na przykład adoptuj-krysia.github.io?urlparam1=20
+                    params={"urlparam1": 20, "urlparam2": 30}
+                )
+            except requests.RequestException as rex:
+                print(str(rex))
+            else:
+                # Można na przykład sparsować stronę BeautifulSoupem
+                soup = BeautifulSoup(page.content, 'html.parser')
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Proste polecenie POST z dodatkowymi danymi</h2>
+            <pre><code class="python">
+                page = requests.post (
+                    "https://adoptuj-krysia.github.io", 
+                    
+                    # Dane przekazywane w nagłówku zapytania POST
+                    data={"key": 123})
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Pobieranie danych z obiektu odpowiedzi</h2>
+            <pre><code class="python">
+                request = requests.post("https://adoptuj-krysia.github.io")
+
+                # Zawartość odpowiedzi w bajtach
+                request.content 
+
+                # Zawartość odpowiedzi w formie tekstowej
+                requests.text
+
+                # Zawartość odpowiedzi w formie słownika 
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Ciasteczka</h2>
+            <pre><code class="python">
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Timeout</h2>
+            <pre><code class="python">
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Sesja</h2>
+            <p>Stworzenie sesji umożliwia współdzielenie ciasteczek między poszczególnymi zapytaniami. Aby zapisać sesję między uruchomieniami skryptu, należy skorzystać z dowolnej biblioteki do serializacji, na przykład pickle.</p>
+            <pre><code class="python">
+                with requests.Session() as s:
+                    with s.get("https://google.com") as r:
+                        print(r.status_code)
+                    print(s.cookies)
+            </code></pre>
+        </section>
+    </div>
+    <script src="resources/js/highlight.min.js"></script>
+    <script src="resources/js/jquery.min.js"></script>
+    <script src="resources/js/normalize-indents.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5. Biblioteka argparse</title>
+
+    <link rel="stylesheet" href="../../css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="resources/css/highlight.min.css">
+    <link rel="stylesheet" href="resources/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>5. Biblioteka argparse</h1>
+        <hr/>
+
+        <section class="code-section">
+            <h2>Do czego służy?</h2>
+            <p>Biblioteka argparse jest biblioteką domyślną Pythona i umożliwia ona parsowanie argumentów wiersza poleceń. Wszystkie poniższe bloki kodu wymagają zaimportowania modułu argparse.</p>
+            <pre><code class="python">
+                import argparse
+            </code></pre>
+            <p>W argparse, mamy dwa rodzaje argumentów:</p>
+            <pre><code class="bash">
+                $ cp /etc/passwd /home/daniel/etc/passwd
+                # Pliki /etc/passwd oraz /home/daniel/etc/passwd są tutaj argumentami pozycyjnymi
+                # Argumenty pozycyjne to takie, które są wymagane do działania skryptu
+
+                $ df -h
+                # Argument -h jest tutaj argumentem opcjonalnym, ponieważ bez niego komenda również zadziała
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Podpowiedź - sposób umieszczenia kodu</h2>
+            <p>Skrypt parsujący argumenty powinien sprawdzać, czy moduł został uruchomiony bezpośrednio z wiersza konsoli</p>
+            <pre><code class="python">
+                # Ten if wykona się tylko, jeśli moduł uruchomiono bezpośrednio z konsoli
+                # Jeżeli moduł został zaimportowany przez inny plik .py, instrukcja warunkowa nie wykona się
+                if __name__ == "__main__":
+                    argparser = argparse.Argumentparser()  # [...] i tak dalej
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Tworzenie obiektu parsera</h2>
+            <pre><code class="python">
+                argparser = argparse.ArgumentParser(
+                    # Opis aplikacji pokazywany w wiadomości pomocniczej --help
+                    description='Fetch news from our dear school website',
+
+                    # Czy generować automatycznie wiadomość pomocy (-h lub --help)
+                    add_help=True,
+
+                    # Nazwa pliku wykonywalnego, który uruchamia program, wyświetlana w --help
+                    # Domyślnie jest to os.argv[0] i nie ma sensu tego zmieniać
+                    prog="myprogram.py",
+
+                    # Tekst wyświetlany na samym końcu menu pomocy
+                    epilog="Made by Damian Rogalski :)",
+
+                    # Zmienia string usage skryptu, który normalnie jest generowany z dołączonych argumentów
+                    # %(prog)s zostanie podmienione przez argparser.prog
+                    usage="%(prog)s [options]",
+
+                    # Znaki, które oznaczają argument (domyślnie jest to tylko minus)
+                    prefix_chars="/+-",
+                )
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Dodanie do obiektu parsera argumentu opcjonalnego</h2>
+            <p>(argument opcjonalny poznajemy po użyciu znaków -- lub -)</p>
+            <pre><code class="python">
+            argparser.add_argument(
+                # Krótka wersja
+                "-s",
+
+                # Długa wersja
+                "--synchronize",
+
+                # Jest to nazwa, pod jaką ten argument będzie możliwy do pobrania po sparsowaniu
+                # Na przykład args.sync
+                dest="sync",
+
+                # String, jako który zostanie zastąpiona wartość w oknie pomocy
+                metavar="miliseconds_value":
+
+                # Typ wymagany przez argument
+                type = int,
+
+                # Potężny argument, pozwala na przykład liczyć ilość wystąpienia danego argumentu
+                # Domyślnie akcja to "store", czyli po prostu zapisz wartość przypisaną do danego argumentu
+                action="store",
+
+                # Wartości możliwe do wyboru
+                choices=[123, 234, 345],
+
+                # Normalnie, argparse wymaga tylko parametrów bez znaków -- przed nazwą
+                # Aby argument był wymagany, trzeba mu ustawić required na true
+                required=True,
+
+                # Wartość domyślna, wpisywana jeśli nie podano argumentu
+                default=3000,
+
+                # Wiadomośc pomocnicza do tego argumentu, pokazywana w menu pomocy
+                help="Amount of miliseconds to synchronize"
+            )
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Dodanie do obiektu parsera argumentu pozycyjnego</h2>
+            <p>Argument pozycyjny jest wymagany, poznajemy go po braku znaków --</p>
+            <pre><code class="python">
+                parser.add_argument(
+                    dest="l1",
+                    type=int,
+                    help="Liczba 1"
+                )
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Pobranie wersji programu</h2>
+            <p>Argparse ma specjalny rodzaj akcji, przeznaczony tylko wyświetleniu wersji.</p>
+            <pre><code class="python">
+                # Pobranie wersji programu to osobny typ akcji
+                argparser.add_argument(
+                    "-v", "--version",
+                    action="version",
+                    version="Program version: 2.0.0"
+                )
+            </code></pre>
+        </section>
+
+
+        <section class="code-section">
+            <h2>Flaga</h2>
+            <p>Flaga zwraca True, jeżeli argument był obecny lub zwraca False, jeśli użytkownik nie podał tego ergumentu.</p>
+            <p>Mechanizm flagi jest realizowany przez akcję store_true</p>
+            <pre><code class="python">
+                argparser.add_argument(
+                    "-f"
+                    "--flag",
+                    dest="myflag",
+                    action="store_true",
+                    help="Help message"
+                )
+            </code></pre>
+            <pre><code class="python">
+                # wywołanie komenda.py spowoduje, że args.myflag będzie False
+                # wywołanie komenda.py -f spowoduje, że args.myflag będzie True
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Policzenie ilości wystąpień danej flagi</h2>
+            <p>Powyższy mechanizm jest realizowany przez funkcję count</p>
+            <pre><code class="python">
+                argparser.add_argument(
+                    "-v",
+                    "--verbose",
+                    dest="verbosity",
+                    help="Help message",
+                    default=0
+                )
+            </code></pre>
+            <pre><code class="python">
+                # wywołanie komenda.py spowoduje, że args.verbosity będzie równe 0
+                # wywołanie komenda.py -vvv spowoduje, że args.verbosity będzie równe 1
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Sparsowanie argumentów i sposób ich pobierania</h2>
+            <pre><code class="python">
+                # jeśli w nawiasach nie podano kolekcji argumentów, pobierze argumenty z systemu
+                args = argparser.parse_args() 
+
+                # pobiera wartość argumentu o dest="sync"
+                print(args.sync) 
+            </code></pre>
+        </section>
+    </div>
+    <script src="resources/js/highlight.min.js"></script>
+    <script src="resources/js/jquery.min.js"></script>
+    <script src="resources/js/normalize-indents.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>

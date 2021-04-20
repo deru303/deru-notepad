@@ -1,0 +1,13 @@
+# This file fixes long shutdown time problem, 
+# which sometimes occurs after enabling docker unit.
+
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = docker
+
+[Action]
+Description = Fixing docker systemd entries
+When = PostTransaction
+Exec = /usr/bin/sed -i "s/KillMode=process/KillMode=fixed/" "/usr/lib/systemd/system/docker.service"

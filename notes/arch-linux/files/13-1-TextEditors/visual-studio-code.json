@@ -1,0 +1,8 @@
+{
+    "editor.fontFamily": "'Consolas', 'monospace', monospace, 'Droid Sans Fallback'",
+    "window.dialogStyle": "custom",
+    "window.titleBarStyle": "custom",
+    "workbench.colorTheme": "Visual Studio Dark",
+    "php.validate.executablePath": "/bin/php",
+    "python.defaultInterpreterPath": "/bin/python3"
+}

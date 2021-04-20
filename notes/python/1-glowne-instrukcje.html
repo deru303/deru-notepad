@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1. Głowne instrukcje</title>
+
+    <link rel="stylesheet" href="../../css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="resources/css/highlight.min.css">
+    <link rel="stylesheet" href="resources/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>1. Główne instrukcje i elementy języka</h1>
+        <hr/>
+
+        <section class="code-section">
+            <h2>Podstawowe pratyki nazewnictwa</h2>
+            <ul>
+                <li>Nazwy klas zapisane w CamelCase, na przykład PersonDecoratorFactory</li>
+                <li>Nazwy zmiennych i funkcji zapisane w snake_case, na przykład fetch_from_web</li>
+                <li>Nazwy zaczynające się od podkreślnika to pola chronione, które zwyczajowo nie powinny być modyfikowane poza klasą, na przykład _person_age</li>
+            </ul>
+        </section>
+
+        <section class="code-section">
+            <h2>Deklarowanie zmiennych</h2>
+            <pre><code class="python">
+                my_variable = 38
+                my_variable = "test string"
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Podstawowe typy (klasy) wbudowane</h2>
+            <p>Poniżej ukazano sposoby konwersji stringów na inne wartości. W przypadku, gdy taka konwersja nie będzie możliwa, zostanie podniesiony wyjątek ValueError.</p>
+            <pre><code class="python">
+                my_str = str("string")  # typ str (string)
+                my_int = int("20")  # typ int (liczby całkowite)
+                my_float = float("3.14")  # typ float (liczby zmiennoprzecinkowe)
+                my_bool = bool(False)  # typ logiczny prawda/fałsz
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Typ logiczny bool</h2>
+            <p>W Pythonie, wartości True i False pisze się z wielkiej litery.</p>
+            <pre><code class="python">
+                my_bool = True
+                my_bool = False
+                my_bool = bool("False")  # zwróci True, bo na False konwertowane są wyłacznie puste stringi
+
+                # Prawdziwy sposob konwersji wartości "False" na False:
+                import distutils.util
+                my_bool = bool(distutils.util.strtobool("False"))
+                # distutils.util.strtobool zwraca wartość int, którą jeszcze konwertujemy na bool
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Wartość None</h2>
+            <p>Python nie ma wartości null, zastępuje ją None. None jest bardzo podobne do wartości Unit w Kotlinie. Każda funkcja, jeśli nie zwraca nic innego, zwraca None. None jest Singletonem, obiektem klasy NoneType.</p>
+            <pre><code class="python">
+                def my_func():
+                    pass
+                print(type(my_func()))  # wydrukuje typ &lt;class 'NoneType'&gt;
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Operatory</h2>
+            <pre><code class="python">
+                # Operatory logiczne
+                x, y = True, False
+                x == y  # False
+                x != y  # True
+                x and y  # False
+                x or y  # True
+                not x  # False
+
+                # Operatory porównania
+                x, y = 20, 2020
+                x &lt; x
+                x &gt; y
+                x &gt;= y
+                x &lt;= y
+
+                # Operatory porównania można łączyć w łańcuchy
+                200 >= x >= 1000  # czy x jest z przedziału domkniętego 200-1000
+
+                # Dodatkowe operatory matematyczne
+                x, y = 2, 8
+                x ** y  # dwa do potegi 8
+                x // y  # dzielenie całkowite
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Klauzula is</h2>
+            <p>Klauzula is pozwala sprawdzić, czy dwa obiekty wskazują na to samo miejsce w pamięci RAM.</p>
+            <pre><code class="python">
+                my_list = []
+
+                # Bardzo czesto wyrażenie is używa się właśnie w porównywaniu do wartości logicznych
+                my_bool = my_list == False  # wyrażenie prawdziwe, bo pusta lista jest ewaluowana do wartości False
+                my_bool = my_list is False  # wyrażenie fałszywe, bo lista nie jest wartością logiczną False
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Ogólne informacje nt. wartości w Pythonie</h2>
+            <ul>
+                <li>W języku Python wszystko jest obiektem (klasa również, obiektem klasy class)</li>
+                <li>Wszystkie klasy dziedziczą po klasie nadrzędnej object</li>
+            </ul>
+        </section>
+
+        <section class="code-section">
+            <h2>Pobieranie typu wskazanej wartości</h2>
+            <pre><code class="python">
+                # Aby sprawdzić, jakiego typu jest dana wartość, używamy funkcji type
+                x = "string value"
+                x_type = type(x)
+                print(x_type)
+
+                # Aby sprawdzić, czy dany obiekt jest instancją jakiejś klasy, używamy funkcji isinstance
+                x = "string value"
+                is_x_object = isinstance(x, object)  # klasa nadrzędna object
+                print(is_x_object)  # wydrukuje True
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Pass - instrukcja, która nic nie robi</h2>
+            <p>Instrukcja pass nic nie robi, używa sie jej do oznaczania pustych funkcji, klas i innych instrukcji.</p>
+            <pre><code class="python">
+                if(my_bool is True):
+                    pass
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Przydatne moduły matematyczne</h2>
+            <h3>Decimal - klasa do przechowywania bardzo dużych liczb</h3>
+            <pre><code class="python">
+                from decimal import Decimal, getcontext as decimal_context
+                # Stworzenie liczb
+                x = Decimal("12356890" * 10)  # mnożenie stringa - potwórz stringa 10 razy
+                y = Decimal("0987654321" * 10)
+                decimal_context().prec = 99999  # ustawienie precyzji obliczeń
+                print(x + y)  # przykładowe działanie na decimalach
+            </code></pre>
+            <h3>Divmod - wygodne dzielenie z resztą</h3>
+            <pre><code class="python">
+                # Przydatna funkcja do dzielenia - divmod(x, y)
+                # Wykonuje dzielenie i zwraca krotkę (część_całkowita, reszta)
+                integer, remainder = divmod(10, 3)  # odpakowanie krotki do dwóch zmiennych
+                print(integer, remainder)  # wyświetli "3 1"
+            </code></pre>
+        </section>
+
+        <section class="code-section">
+            <h2>Instrukcja warunkowa - if</h2>
+            <pre><code class="python">
+                if x == "20":
+                    pass
+                elif x == "30":
+                    pass
+                else
+                    pass
+            </code></pre>
+        </section>
+    </div>
+    <script src="resources/js/highlight.min.js"></script>
+    <script src="resources/js/jquery.min.js"></script>
+    <script src="resources/js/normalize-indents.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>

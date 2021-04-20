@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="../../css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <title>Edytor Vim - podstawy użytkowania</title>
+</head>
+<body>
+    <div class="container" id="main-container">
+        <h1>Edytor Vim - podstawy użytkowania</h1>
+
+        <section>
+            <h2>Strzałki</h2>
+            <p>W Vimie, zamiast ze strzałek, zaleca się korzystać z klawiszy hjkl.</p>
+            <div>
+                <strong>hjkl &larr; &darr; &uarr; &rarr;</strong>
+            </div>
+            <ul>
+                <li>
+                    <strong>h</strong> - lewo
+                </li>
+                <li>
+                    <strong>j</strong> - dół
+                </li>
+                <li>
+                    <strong>k</strong> - góra
+                </li>
+                <li><strong>l</strong> - prawo</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Cofanie i powtarzanie działań</h2>
+
+            <div>
+                <strong>u</strong> - cofnij poprzednio wykonaną operację (<strong>u</strong>ndo)
+            </div>
+
+            <div>
+                <strong>U</strong> - cofnij wszystkie operacje wykonane w aktualnej linijce (<strong>U</strong>ndo)
+            </div>
+
+            <div>
+                <strong>Ctrl + r</strong> - powtórzenie cofniętej operacji (<strong>r</strong>edo) 
+            </div>
+
+            <div>
+                <strong>. (kropka)</strong> - potwórz ostatnią komendę (jeżeli wykonaliśmy operację na linijce 1, a kropkę wciśniemy na linijce 3, to zmiana zostanie wykonana na linijce 3)
+            </div>
+        </section>
+
+        <section>
+            <h2>Wychodzenie z Vima</h2>
+            <div>
+                <h3>Bez zapisywania</h3>
+                <ul>
+                    <li><strong>:q!</strong></li>
+                    <li><strong>Shift + ZQ</strong></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3>Z zapisywaniem</h3>
+                <ul>
+                    <li><strong>:wq lub :x</strong></li>
+                    <li><strong>Shift + ZZ</strong></li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Zmiana trybu edytora</h2>
+            <div>
+                <strong>literka i</strong> - (insert) włącza tryb insert na lewo od kursora
+            </div>
+            <div>
+                <strong>literka a</strong> - (append) włącza tryb insert na prawo od kursora
+            </div>
+            <div>
+                <strong>literka A</strong> - (Append) włącza tryb insert na końcu linijki (skrajne prawo)
+            </div>
+            <div>
+                <strong>literka I</strong> - (Insert) włącza tryb insert na początku linijki (skrajne lewo)
+            </div>
+            <div>
+                <strong>literka o</strong> - (open) wstawia enter po obecnej linijce i przełącza w tryb insert
+            </div>
+            <div>
+                <strong>literka O</strong> - (Open) wstawia enter przed obecną linijką i przełącza w tryb insert
+            </div>
+
+        </section>
+
+        <section>
+            <h2>Nawigowanie po dokumencie</h2>
+            
+            <h3>Standardowe poruszanie kursorem</h3>
+            <div>
+                Do normalnego poruszania kursorem używamy klawiszy <strong>hjkl</strong>.
+            </div>
+
+            <h3>Literka z?</h3>
+            <div>
+                <ul>
+                    <li><strong>zz</strong> - przenieś linijkę, na której jest obecnie kursor, na środek ekranu</li>
+                    <li><strong>zt</strong> - przenieś linijkę, na której jest obecnie kursor, na górę ekranu (<strong>z</strong> top)</li>
+                    <li><strong>zb</strong> - przenieś linijkę, na której jest obecnie kursor, na dół ekranu (<strong>z</strong> bottom)</li>
+                </ul>
+            </div>
+
+            <h3>Poruszanie się w obrębie linijki</h3>
+            <div>
+                <div><strong>0</strong> - przenieś na początek linijki</div>
+                <div><strong>$</strong> - przenieś na koniec linijki</div>
+            </div>
+
+            <h3>Przeskakiwanie do następnego słowa</h3>
+            <div>
+                <div><strong>w</strong> - przeskocz do początku nastepnego słowa</div>
+                <div><strong>3w</strong> - przeskocz do początku trzeciego następnego słowa</div>
+                <div><strong>e</strong> - przeskocz do końca obecnego (lub następnego) słowa</div>
+            </div>
+
+            <h3>Przeskakiwanie linijek</h3>
+            <div>
+                <div><strong>10j</strong> - przeskocz o 10 linijek w dół (j to klawisz przesuwania kursora w dół)</div>
+                <div><strong>10k</strong> - przeskocz o 10 linijek w górę (k to klawisz przesuwania kursora w górę)</div>
+            </div>
+
+            <h3>Przeskakiwanie do poprzedniego słowa</h3>
+            <div>
+                <div><strong>b</strong> - przeskocz do początku poprzedniego słowa</div>
+                <div><strong>3b</strong> - przeskocz do początku trzeciego poprzedniego słowa</div>
+            </div>
+
+            <h3>Przeskakiwanie paragrafów</h3>
+            <div>
+                <div><strong>Shift+{</strong> (paragraf w górę)</div>
+                <div><strong>Shift+}</strong> (paragraf w dół)</div>
+            </div>
+
+            <h3>Przeskakiwanie na początek/koniec pliku</h3>
+            <div>
+                <div><strong>gg</strong> - początek pliku</div>
+                <div><strong>G</strong> - koniec pliku</div>
+            </div>
+
+            <h3>Procentowe poruszanie się po pliku</h3>
+            <div>
+                <div><strong>50%</strong> - przejdź do połowy pliku</div>
+                <div><strong>75%</strong> - przejdź do 75% pliku</div>
+                <div><strong>Ctrl+g</strong> - wyświetl w którym procencie pliku jesteś</div>
+            </div>
+
+            <h3>Powróć do ostatniego miejsca</h3>
+            <div><strong>''</strong> - (dwa apostrofy) przenieś kursor do poprzedniej pozycji</div>
+
+
+            <h3>Przeskakiwanie do sąsiadującego nawiasu</h3>
+            <div>
+                Mamy tekst: TEKST POZA (TEKST W NAWIASIE) NAWIASEM
+            </div>
+            <div>Jeżeli mamy kursor ustawiony na jednym z nawiasów, możemy wcisnąć klawisz %, aby przenieść się do tego drugiego.</div>
+        </section>
+
+        <section>
+            <h2>Kasowanie tekstu</h2>
+
+            <h3>Usuwanie znaku pod kursorem</h3>
+            <div>
+                W <strong>normal mode</strong> można wcisnąć klawisz <strong>x</strong>, aby skasować literkę, która jest pod kursorem.
+            </div>
+
+            <h3>Delete around, delete inside</h3>
+            <div>
+                Mamy tekst: TEKST "W CUDZYSŁOWIE" I POZA NIM
+            </div>
+            <div>
+                <strong>di"</strong> - delete inside " - spowoduje wygenerowanie tekstu TEKST "" I POZA  NIM
+                <strong>da"</strong> - delete around " - spowoduje wygenerowaie tekstu TEKST I POZA NIM
+            </div>
+            <div>Działa to również np. dla nawiasów i wielu innych obiektów.</div>
+
+            <h3>Inne możliwości da?, di?</h3>
+            <div>
+                <div><strong>dap, dip</strong> - delete around paragraph, delete inside paragraph (kasowanie paragrafu)</div>
+                <div><strong>daw, diw</strong> - delete around word, delete inside word (kasowanie słowa, ale w przeciwieństwie do samego dw, nie trzeba być na początku tego słowa)</div>
+            </div>
+
+            <h3>Skrót klawiszowy d?</h3>
+            <div>
+                <div><strong>dd</strong> - usuń obecną linijkę</div>
+                <div><strong>dw</strong> - (delete word) usuń wyraz, na którym jest ustawiony kursor</div>
+                <div><strong>d$, D</strong> - (delete $, dolar jest znakiem końca linijki w regexie) usuń wszystkie literki od kursora do końca linijki</div>
+                <div><strong>d0</strong> - (delete 0, zero w Vimie oznacza początek linijki) usuń wszystkie literki od kursora do początku linijki</div>
+            </div>
+
+            <h3>Skrót klawiszowy d??</h3>
+            <div>
+                <div><strong>d5d</strong> - usuń obecną linijkę i 4 następne (razem 5)</div>
+                <div><strong>d5w</strong> - usuń obecne słowo i 4 następne (razem 5)</div>
+                <div><strong>d5}</strong> - usuń obecny paragraf i 4 następne (razem 5)</div>
+            </div>
+
+            <h3>Literka c?</h3>
+            <div>Wszystkie polecenia zaczynające się od d mogą też zaczynać się od c. Będą wtedy robić dokładnie to samo, ale dodatkowo po wywołaniu przeniosą użytkownika w tryb insert. Na przykład <strong>ci(</strong> spowoduje usunięcie wszystkich znaków w nawiasach () i przełączenie edytora w tryb wprowadzania.</div>
+        </section>
+
+        <section>
+            <h2>Wklejanie (put)</h2>
+
+            Jeśli przed chwilą skasowano coś skrótem zaczynającym się od d, na przykład dd, można to wkleić przyciskiem p.
+
+            <div>Aby wkleić kilka razy, można napisać np. 5p.</div>
+        </section>
+
+        <section>
+            <h2>Zamienianie - literka r</h2>
+
+            Jeżeli aktualnie zaznaczona jest jakaś literka, można wpisać na przykład ru, żeby zamienić tę literkę na literkę u.
+        </section>
+
+        <section>
+            <h2>Tryb zamieniania - literka R</h2>
+
+            Wciskając literkę R, włączamy tryb zamieniania - pisząc, będziemy zamieniać literki pod kursorem.
+        </section>
+
+        <section>
+            <h2>Wyszukiwanie - ? oraz /</h2>
+
+            <div><strong>/</strong> - wyszukiwanie do przodu</div>
+            <div><strong>?</strong> - wyszukiwanie do tyłu</div>
+            <div><strong>n</strong> - następny wynik wyszukiwania</div>
+            <div><strong>N</strong> - poprzedni wynik wyszukiwania</div>
+        </section>
+
+        <section>
+            <h2>Tabulacja linii</h2>
+
+            <div><strong>&gt;&gt;</strong> - tabuluj zaznaczoną linię w prawo</div>
+            <div><strong>&lt;&lt;</strong> - tabuluj zaznaczoną linię w lewo</div>
+            <div><strong>2&gt;&gt;</strong> - tabuluj zaznoczoną linię w prawo (2 razy)</div>
+            <div>Tabulacji można też używać w trybie Visual, aby tabulować więcej niż jedną linijkę naraz. Wtedy wystarczy tylko pojedynczy znak &lt; i &gt;.</div>
+        </section>
+
+        <section>
+            <h2>Wyszukiwanie - literka f (find)</h2>
+
+            <div><strong>fn</strong> - przenieś mnie do następnej literki n</div>
+            <div><strong>fR</strong> - przenieś mnie do następnej literki R</div>
+        </section>
+
+
+        <section>
+            <h2>Substitute (search and replace)</h2>
+
+            <div>Wszystkie poniższe pozycje są komendami - zaczynają się od dwukropka, tak jak np. komenda :wq!</div>
+
+            <div><strong>:s/foo/bar/</strong> - znajdź w obecnej linijce pierwsze wystąpienie "foo" i zamień na  "bar"</div>
+            <div><strong>:s/foo/bar/g</strong> - znajdź w obecnej linijce wszystkie wystąpienia "foo" i zamień na  "bar"</div>
+            <div><strong>:%s/foo/bar/g</strong> - znajdź we wszystkich linijkach wszystkie wystąpienia "foo" i zamień na  "bar"</div>
+            <div><strong>:%s/foo/bar/gc</strong> - znajdź we wszystkich linijkach wszystkie wystąpienia "foo" i zamień na  "bar", ale przed każdą linijką zapytaj, czy chcesz ją zmienić</div>
+        </section>
+
+        <section>
+            <h2>Kopiowanie tekstu (yanking)</h2>
+
+            <h3>Sposoby kopiowania:</h3>
+            <div>
+                <div><strong>yy</strong> - skopiowanie aktualnej linijki</div>
+                <div><strong>yd</strong> - skopiowanie aktualnego słowa</div>
+                <div><strong>y5d</strong> - skopiowanie 5 słów</div>
+                <div><strong>yaw</strong> - (yank around word)</div>
+                <div><strong>yip</strong> - (yank inside paragraph)</div>
+                <div><strong>ya"</strong> - (yank around ")</div>
+            </div>
+
+            <div><strong>Do wklejania skopiowanego tekstu używamy literki p.</strong></div>
+        </section>
+
+        <section>
+            <h2>Tryby visual</h2>
+
+            <h3>Sposoby włączenia trybu Visual:</h3>
+            <div>
+                <div><strong>v</strong> - włącz tryb visual, umożliwiający zaznaczanie tekstu</div>
+                <div><strong>V</strong> - włącz tryb visual line, umożliwiający zaznaczanie całych linijek</div>
+                <div><strong>Ctrl+v</strong> - włącz tryb visual block, umożliwiający zaznaczanie blokowe</div>
+                <div><strong>vap, vip</strong> - visual around paragraph, visual inside paragraph</div>
+            </div>
+
+            <h3>Możliwości trybu visual:</h3>
+            <div>
+                <div><strong>d</strong> - usuń zaznaczony tekst</div>
+                <div><strong>y</strong> - yank text (yanking is basically copying in Vim), można ten tekst wkleić literką p (put)</div>
+            </div>
+
+            <h3>Jak pisać w wielu linijkach?</h3>
+            <ul>
+                <li>przełącz się do trybu visual block przyciskiem Ctrl+v</li>
+                <li>zaznacz miejsce, w którym chcesz zacząć pisać w wielu linijkach</li>
+                <li>wciśnij A lub I (w zależności od tego, czy chcesz pisać po zaznaczeniu, czy przed zaznaczeniem)</li>
+                <li>wpisz twój tekst i naciśnij Enter</li>
+            </ul>
+        </section>
+    </div>
+</body>
+</html>

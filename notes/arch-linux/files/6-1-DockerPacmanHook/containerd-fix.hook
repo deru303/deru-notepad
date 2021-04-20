@@ -1,0 +1,13 @@
+# This file fixes long shutdown time problem, 
+# which sometimes occurs after enabling containerd unit.
+
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = containerd
+
+[Action]
+Description = Fixing containerd systemd entries
+When = PostTransaction
+Exec = /usr/bin/sed -i "s/KillMode=process/KillMode=fixed/" "/usr/lib/systemd/system/containerd.service"

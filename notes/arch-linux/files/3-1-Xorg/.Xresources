@@ -1,0 +1,78 @@
+rofi.theme: onedark
+
+Sxiv.font: Cantarell Extra Bold:size=10 
+Sxiv.foreground: #dadada
+Sxiv.background: #000010
+
+Xft.dpi:                    96
+Xft.antialias:              true
+Xft.rgba:                   rgb
+Xft.hinting:                true
+Xft.hintstyle:              hintslight
+
+*background: #000010
+*foreground: #ffffff
+*cursorColor: #93a1a1
+*pointerColorBackground: #586e75
+*pointerColorForeground: #93a1a1
+
+*color0: #000000
+*color8: #666666
+*color1: #9e1828
+*color9: #cf6171
+*color2: #aece92
+*color10: #c5f779
+*color3: #968a38
+*color11: #fff796
+*color4: #414171
+*color12: #4186be
+*color5: #963c59
+*color13: #cf9ebe
+*color6: #418179
+*color14: #71bebe
+*color7: #bebebe
+*color15: #ffffff
+
+URxvt.internalBorder:       10
+URxvt.depth:                32
+URxvt.geometry:             90x30
+URxvt.loginShell:           true
+URxvt.lineSpace:            0
+URxvt.iso14755: false
+URxvt.iso14755_52: false
+URxvt*shading: 15
+URxvt*saveLines: 12000
+URxvt*foreground: #ffffff
+URxvt*background: #000010
+URxvt.keysym.Shift-Up: command:\033]720;1\007
+URxvt.keysym.Shift-Down: command:\033]721;1\007
+URxvt.font:xft:MesloLGL Nerd Font:pixelsize=13.5
+URxvt.boldfont:xft:MesloLGL Nerd Font:pixelsize=13.5
+URxvt*letterSpace: -1
+URxvt.scrollBar: false
+
+dwm.normfgcolor: #dadada
+dwm.normbgcolor: #000010
+dwm.normbordercolor: #444444
+dwm.selfgcolor: #dadada
+dwm.selbgcolor: #242f5f
+dwm.selbordercolor: #005577
+dwm.font: Cantarell Extra Bold:size=11
+dwm.fontsymbols: Symbols Nerd Font:size=11
+dwm.borderpx: 1
+dwm.snap: 0
+dwm.smartgaps: 0
+dwm.gappih: 10
+dwm.gappiv: 10
+dwm.gappoh: 10
+dwm.gappov: 10
+
+st.font: MesloLGL Nerd Font:pixelsize=13.5
+st.fontsymbols: JoyPixels:pixelsize=13.5:antialias=true:autohint=true
+st.borderpx: 10
+
+dmenu.font: sans-serif:size=12:antialias=true:autohint=true
+dmenu.background: #111121
+dmenu.foreground: #b2b2b2
+dmenu.selbackground: #50536b
+dmenu.selforeground: #dfdfdf

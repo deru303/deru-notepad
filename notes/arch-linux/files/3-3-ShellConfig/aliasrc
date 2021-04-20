@@ -1,0 +1,12 @@
+#!/bin/sh
+
+alias ls='ls --color=auto'
+alias diff='diff --color=auto'
+alias grep='grep --color=auto'
+alias ip='ip -color=auto'
+
+alias ip-wifi='ip addr show wlp2s0'
+alias ip-lan='ip addr show enp3s0'
+alias wifi-list='nmcli dev wifi'
+
+alias suck='cd /home/daniel/.config/suckless'

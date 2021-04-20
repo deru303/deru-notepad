@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="../../css/bootstrap.min.css"/>
+    <title>Document</title>
+</head>
+<body>
+    <div class="container" id="main-container">
+        <h1>Docker - podstawy</h1>
+
+        <section>
+            <h2>Słowniczek pojęć</h2>
+            <ul>
+                <li>
+                    <div><strong>kontener</strong></div>
+                    uruchomiona instancja aplikacji; każda aplikacja, jak nginx czy mysqld, uruchamiana jest w osobnym kontenerze
+                </li>
+                <li>
+                    <div><strong>obraz</strong></div>
+                    plik z danym programem; obrazem może być na przykład nginx, system Ubuntu lub napisana przez użytkownika aplikacja w Pythonie; obraz jest "przepisem" na stworzenie kontenera
+                </li>
+                <li>
+                    <div><strong>komputer-host</strong></div>
+                    komputer na którym zainstalowano Dockera
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Nazewnictwo kontenerów</h2>
+            <div>Każdy kontener ma dwie wartości, które go jednoznacznie identyfikują.</div>
+            <ul>
+                <li>
+                    <div><strong>identyfikator kontenera</strong></div>
+                    ciąg losowych cyfr i znaków, automatycznie generowany w momencie utworzenia kontenera
+                </li>
+                <li>
+                    <div><strong>nazwę kontenera</strong></div>
+                    czytelna przez człowieka nazwa; domyślnie Docker generuje własną, ale można ją zastąpić używając flagi <code>--name</code> polecenia <code>docker run</code>
+                </li>
+            </ul>
+            <div>Obie wartości można stosować zamiennie do jednoznacznego definiowania kontenera. W dalszej części notatki, obie wartości będą skrótowo nazywane "nazwą kontenera".</div>
+        </section>
+
+        <section>
+            <h2>Podstawowe komendy</h2>
+            <ul>
+                <li>
+                    <div><strong>docker version</strong></div>
+                    wyświetla wersję programu Docker
+                </li>
+                <li>
+                    <div><strong>docker pull mysql</strong></div>
+                    pobiera obraz dla kontenera mysql
+                </li>
+                <li>
+                    <div><strong>docker run httpd</strong></div>
+                    uruchamia kontener na podstawie określonego obrazu, w tym przypadku obrazu serwera httpd
+                </li>
+                <li>
+                    <div><strong>docker images</strong></div>
+                    wyświetla listę pobranych obrazów
+                </li>
+                <li>
+                    <div><strong>docker stop nazwa_kontenera</strong></div>
+                    zatrzymuje kontener o podanej nazwie
+                </li>
+                <li>
+                    <div><strong>docker ps</strong></div>
+                    lista obecnie uruchomionych kontenerów
+                </li>
+                <li>
+                    <div><strong>docker ps -a</strong></div>
+                    lista wszystkich kontenerów, także tych, które już skończyły pracę
+                </li>
+                <li>
+                    <div><strong>docker rm nazwa_kontenera</strong></div>
+                    usuwa kontener z listy wyświetlanej przez powyższą komendę</li>
+                <li>
+                    <div><strong>docker images</strong></div>
+                    wyświetla pobrane obrazy dockera
+                </li>
+                <li>
+                    <div><strong>docker rmi httpd</strong></div>
+                    usuwa pobrany obraz Apache2
+                </li>
+                <li>
+                    <div><strong>docker inspect nazwa_kontenera</strong></div>
+                    pokazuje szczegółowe informacje na temat kontenera, na przykład jego adres IP
+                </li>
+                <li>
+                    <div><strong>docker logs nazwa_lub_id_kontenera</strong></div>
+                    pokazuje co dany kontener wydrukował do standardowego wyjścia (zwykle przydatne, gdy uruchomiliśmy kontener w trybie detached)
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Sieć</h2>
+
+            <section>
+                <h3>Mapowanie portów</h3>
+                <div>Domyślnie, każdy kontener Dockera ma własne lokalne IP w podsieci 172.17.0.1.</div>
+                <div>Można to IP podejrzeć poleceniem <code>docker inspect</code>.</div>
+                <div>To IP jest widziane tylko z poziomu komputera-hosta, inne komputery w sieci nie są w stanie się do niego podłączyć.</div>
+                <div>Aby zmapować port z wewnętrznego IP Dockera na port komputera-hosta, należy użyć odpowiedniej flagi polecenia docker run.</div>
+                <div><code>
+                    docker run -p 7777:8080 nazwa_aplikacji
+                </code></div>
+                <div> W powyższym przykładzie, normalnie aplikacja działa na wewnętrznym porcie 8080, ale my wystawiamy ją do portu 7777 komputera-hosta. Ten port nie może być wykorzystywany przez inne aplikacje zainstalowane na komputerze hoście.</div>
+                <div>Możesz sprawdzić, w jakiej sieci działa dany kontener, korzystając z polecenia <strong>docker inspect</strong>.</div>
+            </section>
+
+            <section>
+                <h3>Podział rodzajów sieci</h3>
+                <div>Kontenery Dockera mogą działać na jednym z trzech rodzajów sieci:</div>
+                <ul>
+                    <li>
+                        <strong><div>bridge</div></strong>
+                        domyślny rodzaj sieci używany przez kontenery - sieć wewnętrzna; kontenery będące w tej samej sieci bridge mogą się komunikować między sobą; komputer-host może się komunikować z tymi kontenerami korzystając z ich IP w podsieci 192.17.0.1; inne komputery w sieci komputera-hosta nie mogą się komunikować z tymi kontenerami - chyba że host wystawi dla nich port, korzystając z flagi <code>docker run -p port_hosta:port_kontenera</code>.
+                    </li>
+                    <li>
+                        <strong><div>host</div></strong>
+                        sieć hosta; program będzie traktowany tak, jak gdyby był zainstalowany bezpośrednio na hoście; wszystkie komputery w sieci komputera-hosta mają dostęp do tych kontenerów
+                    </li>
+                    <li>
+                        <strong><div>none</div></strong>
+                        brak połączenia sieciowego
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>Polecenia do obsługi sieci</h3>
+                <div>
+                    <div>Aby wyświetlić listę dostępnych sieci, wydaj komendę:</div>
+                    <div><strong>docker network ls</strong></div>
+                </div>
+                <div>
+                    <div>Aby utworzyć nową sieć bridge (sieć wewnętrzną), wydaj komendę:</div>
+                    <div><strong>docker network create --driver bridge --subnet 172.18.0.10/16 nazwa-twojej-sieci</strong></div>
+                </div>
+                <div>
+                    <div>Standardowo, kontenery uruchamiają się w domyślnej sieci bridge. Aby uruchomić kontener w innej sieci, na przykład tej utworzonej w punkcie powyżej, wydaj polecenie:</div>
+                    <div><strong>docker run --network host mysql</strong></div>
+                </div>
+                <div>
+                    <div>W taki sposób wyświetlisz informacje o podanej przez ciebie sieci:</div>
+                    <div><strong>docker network inspect bridge</strong></div>
+                </div>
+            </section>
+
+            <section>
+                <h3>Docker DNS</h3>
+                <div>
+                    <div>Docker ma wbudowany serwer DNS, który zamienia czytelne nazwy kontenerów na ich adresy IP.</div>
+                    <div>Dzięki temu nie musimy korzystać z IP, bo kontenery mogą się komunikować przy pomocy swoich nazw.</div>
+                    <div>Automatycznie wygenerowane nazwy kontenerów nie są zamieniane na IP - muszą to być kontenery, których nazwę wybrał użytkownik polecenim <strong>docker run --name nazwa</strong>.</div>
+
+                    <div>
+                        <div>Aby jeden kontener mógł pingować drugi, należy je połączyć flagą --lins</div>
+                        <div><code>
+                            docker run --name kontener_1 obraz1<br/>
+                            docker run --name kontener_2 --link kontener_1 obraz2
+                        </code></div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section>
+            <h2>Docker Compose</h2>
+
+            <section>Docker Compose pozwala na uruchomienie kilku kontenerów Dockera z określonymi ustawieniami przez użycie jednej komendy.</section>
+
+            <section>
+                Przykładowy kod pliku docker-compose.yml:
+                <div><code>
+                    version: 3<br/>
+                    services: <br/>
+                    <div style="margin-left: 30px">
+                        db_container:
+                        <div style="margin-left: 30px">image: mysql</div>
+                    
+                        http_container:
+                        <div style="margin-left: 30px">
+                            image: nginx<br/>
+                            ports:
+                            <div style="margin-left: 30px;">
+                                - 5000:80
+                            </div>
+                        </div>
+                        
+                    </div>
+                </code></div>
+            </section>
+
+            <section>
+                Będąc w katalogu, w którym znajuje się docker-compose.yml, wszystkie kontenery uruchomisz przez użycie polecenia <strong>docker-compose up</strong>.
+            </section>
+            
+            <section>
+                Wszystkie utworzone przez Docker Compose kontenery są ze sobą połączone, więc mogą się pomiędzy sobą komunikować przy użyciu nazw hosta.
+            </section>
+
+            <section>
+                DockerCompose posiada  przydatną opcję restart-always, która automatycznie włącza kontenery przy starcie systemu operacyjnego.
+            </section>
+        </section>
+
+        <section>
+            <h2>Dane i woluminy w Dockerze</h2>
+
+            <section>
+                <h3>Katalog roboczy</h3>
+                <div>Docker przechowuje wszystkie swoje dane w katalogu <strong>/var/lib/docker</strong>.</div>
+            </section>
+
+            <section>
+                <h3>Podział</h3>
+                W Dockerze wyróżniamy dwa rodzaje montowania katalogów:
+                <ul>
+                    <li><strong>bind mount</strong> - montowanie katalogu z komputera-hosta do katalogu kontenera</li>
+                    <li><strong>volume mount</strong> - preferowany sposób, montowanie tak zwanego woluminu Dockera</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>Zarządzanie woluminami</h3>
+                <ul>
+                    <li>
+                        <div><strong>docker volume create nazwa_woluminu</strong></div>
+                        <div>tworzy wolumin Dockera o podanej nazwie</div>
+                    </li>
+                    <li>
+                        <div><strong>docker run -v nazwa_woluminu:/var/lib/mysql</strong></div>
+                        <div>montuje katalog /var/lib/mysql kontenera do wskazanego woluminu</div>
+                        <div>zamiast prostej komendy docker run -v, możesz też użyć bardziej skomplikowanej komendy docker run --mount</div>
+                    </li>
+                </ul>
+            </section>
+
+            <div>Korzystanie z woluminów lub montowania jest jedynym sposobem, aby kontener Dockera nie kasował danych po wyłączeniu.</div>
+        </section>
+
+        <section>
+            <h2>Komenda run</h2>
+            <ul>
+                <li>
+                    <div><strong>docker run httpd</strong></div>
+                    uruchamia kontener określonej aplikacji, w tym przypadku kontener Apache2
+                </li>
+                <li>
+                    <div><strong>docker run -d httpd </strong></div>
+                    uruchamia kontener w tle (w trybie detached)
+                </li>
+                <li>
+                    <div><strong>docker run --name unikalna_nazwa httpd</strong></div>
+                    nadaje kontenerowi nazwę (zamiast używać losowej)
+                </li>
+                <li>
+                    <div><strong>docker run httpd:1.2.3</strong></div>
+                    uruchomienie obrazu httpd w konkretnej wersji, tutaj w wersji 1.2.3 (wartość po dwukropku to tak zwany tag)
+                </li>
+                <li>
+                    <div><strong>docker run -it httpd</strong></div>
+                    uruchamia kontener w trybie interaktywnym (normalnie docker nie nasłuchuje wejścia standardowego, dopiero ta flaga to zmienia)
+                </li>
+                <li>
+                    <div><strong>docker run -p 7777:8000 httpd</strong></div>
+                    zmapowanie wewnętrznego portu aplikacji (8000) do wolnego portu komputera-hosta (7777)
+                    <div style="color: red; font-weight: bold;">Uwaga! Utworzona w ten sposób reguła nadpisuje systemowego firewalla i sprawi, że port 7777 będzie dostępny globalnie!</div>
+                </li>
+                <li>
+                    <div><strong>docker run -p 127.0.0.1:7777:8000 httpd</strong></div>
+                    to co wyżej, ale kontener jest dostępny wyłącznie w localhoście
+                </li>
+
+                <li>
+                    <div><strong>docker run -v /opt/datadir:/var/lib/mysql mysql</strong></div>
+                    montuje zawartość katalogu /opt/datadir komputera-hosta do wewnętrznego katalogu /var/lib/mysql w kontenerze
+                </li>
+                <li>
+                    <div><strong>docker run -e ZMIENNA_SRODOWISKOWA=wartosc mysql</strong></div>
+                    umożliwia ustawienie zmiennej środowiskowej kontenerowi
+                </li>
+                <li>
+                    <div><strong>docker run --network host mysql</strong></div>
+                    zmiana sieci, w jakiej jest uruchomiony kontener (domyślnie jest to sieć bridge)
+                </li>
+                <li>
+                    <div><strong>docker run --cpus=.5 ubuntu</strong></div>
+                    kontener będzie mógł używać maksymalnie 50% procesora
+                </li>
+                <li>
+                    <div><strong>docker run --memory=200m ubuntu</strong></div>
+                    kontener będzie mógł używać maksymalnie 200 megabajtów ramu
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Tworzenie własnego obrazu Dockera</h2>
+            <div>Na początku będziemy potrzebowali pliku Dockerfile - specjalnego pliku określającego reguły tworzenia obrazu naszego programu.</div>
+            <div><code>
+                # Tak wygląda przykładowy plik Dockera:<br/>
+                FROM Ubuntu<br/>
+                RUN apt-get update<br/>
+                RUN apt-get install python<br/>
+                RUN pip install flask flask-mysql<br/>
+                COPY . /opt/source-code<br/>
+                ENTRYPOINT FLASK_APP=/opt/source-code/app.py flask run
+            </code></div>
+            <div>Po sporządzeniu pliku Dockerfile, wydajemy następujące komendy:</div>
+            <div><code>
+                docker build Dockerfile -t danielrogowski/my-custom-app # stworzenie lokalnego obrazu<br/>
+                docker push danielrogowski/my-custom-app # wypchnięcie obrazu do repozytorium
+            </code></div>
+        </section>
+    </div>
+</body>
+</html>
