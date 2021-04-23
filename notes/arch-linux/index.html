@@ -507,7 +507,7 @@
                     Na każdym z folderów należy wywołać polecenie <code>sudo make install</code>.
                 </p>
             </section>
-
+/
             <section class="subsection">
                 <h2 class="subsection-heading">9.3. Picom</h2>
                 <span class="badge bg-secondary"><a href="files/9-3-Picom/" target=_blank>Pliki: 9-3-Picom</a></span>
@@ -569,12 +569,15 @@
 
             <section class="subsection">
                 <h2 class="subsection-heading">9.8. Powiadomienia</h2>
+                <span class="badge bg-secondary"><a href="files/9-8-Dunst/" target="_blank">Pliki: 9-8-Dunst</a></span>
 
-                <p>Niektóre aplikacje korzystają z powiadomień systemowych do wyświetlania pewnych danych użytkownikowi. Żeby takie powiadomienia działały, należy doinstalować paczkę notify-osd.</p>
+                <p>Niektóre aplikacje korzystają z powiadomień systemowych do wyświetlania pewnych danych użytkownikowi. Żeby takie powiadomienia działały, należy doinstalować paczkę <strong>dunst</strong> i skopiować plik konfiguracyjny <strong>dunstrc</strong> dołączony do tego podpunktu do katalogu <strong>~/.config/dunst</strong>.</p>
                 <p><code>
-                    sudo pacman -S notify-osd<br/>
+                    sudo pacman -S dunst<br/>
                     notify-send "Testowe powiadomienie."
                 </code></p>
+
+                <p>Demona <strong>dunst</strong> nie trzeba włączać samemu - uruchamia go dbus przy pierwszej próbie wysłania powiadomienia przez jakąś aplikację.</strong>
             </section>
 
             <section class="subsection">
