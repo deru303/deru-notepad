@@ -1,0 +1,118 @@
+set ratios 1:2:3
+set cleaner ~/.config/lf/cleaner
+set previewer ~/.config/lf/preview
+set drawbox true
+set ignorecase true
+set shell bash
+set shellopts '-eu'
+set ifs "\n"
+set scrolloff 10
+set icons
+set period 1
+
+map <enter> open
+cmd q quit
+cmd q! quit
+
+cmd mkdir $mkdir -p "$(echo $* | tr ' ' '\ ')"
+
+cmd bulkrename ${{
+	index=$(mktemp /tmp/lf-bulk-rename-index.XXXXXXXXXX)
+	if [ -n "${fs}" ]; then
+		echo "$fs" > $index
+	else
+		echo "$(ls "$(dirname $f)" | tr ' ' "\n")" > $index
+	fi
+	index_edit=$(mktemp /tmp/lf-bulk-rename.XXXXXXXXXX)
+	cat $index > $index_edit
+	$EDITOR $index_edit
+	if [ $(cat $index | wc -l) -eq $(cat $index_edit | wc -l) ]; then
+		max=$(($(cat $index | wc -l)+1))
+		counter=1
+		while [ $counter -le $max ]; do
+			a="$(cat $index | sed "${counter}q;d")"
+			b="$(cat $index_edit | sed "${counter}q;d")"
+			counter=$(($counter+1))
+			
+			[ "$a" = "$b" ] && continue
+			[ -e "$b" ] && echo "File exists: $b" && continue
+			mv "$a" "$b"
+		done
+	else
+		echo "Number of lines must stay the same"
+	fi
+	rm $index $index_edit
+}}
+
+cmd delete ${{
+	clear; tput cup $(($(tput lines)/3)); tput bold
+	set -f
+	printf "%s\n" "$fx"
+	printf "\nDelete? (y/n)\n"
+	read ans
+	[ $ans = "y" ] && rm -rf -- $fx
+}}
+
+cmd open ${{
+    case $(file --mime-type $f -b) in
+        image/vnd.djvu|application/pdf|application/octet-stream) setsid -f zathura $fx >/dev/null 2>&1 ;;
+        text/*|inode/x-empty) $EDITOR $fx;;
+        image/x-xcf) setsid -f gimp $f >/dev/null 2>&1 ;;
+        image/*) sxiv-rotdir.sh $f | grep -i "\.\(png\|jpg\|jpeg\|gif\|webp\|tif\|ico\)\(_large\)*$" | setsid -f sxiv -aio 2>/dev/null ;;
+        audio/*) mpv --audio-display=no $f ;;
+        video/*) setsid -f mpv $f -quiet >/dev/null 2>&1 ;;
+        application/pdf|application/vnd*|application/epub*) setsid -f zathura $fx >/dev/null 2>&1 ;;
+    esac
+}}
+
+cmd movehere ${{
+    clear; tput cup $(($(tput lines)/3)); tput bold
+    set -f
+    printf "%s\n" "$fx"
+    printf "\nMove to $(pwd)? (y/n)\n"
+    read ans
+    [ $ans = "y" ] || exit
+
+    for x in $fx; do
+        mv -iv "$x" "$(pwd)"
+    done 
+}}
+
+cmd copyhere ${{
+    clear; tput cup $(($(tput lines)/3)); tput bold
+    set -f
+    printf "%s\n" "$fx"
+    printf "\nCopy to $(pwd)? (y/n)\n"
+    read ans
+    [ $ans = "y" ] || exit
+
+    for x in $fx; do
+		cp -ivr "$x" "$(pwd)"
+    done 
+}}
+
+cmd fzf ${{
+    clear && lf -remote "send $id select '$(ls | fzf)'"
+}}
+
+cmd fzfall ${{
+    clear && lf -remote "send $id select '$(ls -a | fzf)'"
+}}
+
+map gg top
+map G bottom
+map U unselect
+
+map f fzf
+map F fzfall
+map B bulkrename
+map D delete
+
+map M movehere
+map C copyhere
+
+map A rename # at the very end
+map c push A<c-u> # new rename
+map I push A<c-a> # at the very beginning
+map i push A<a-b><a-b><a-f> # before extention
+map a push A<a-b> # after extention

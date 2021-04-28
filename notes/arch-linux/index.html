@@ -738,9 +738,10 @@
                 </div>
                 
                 <div class="section-part">
-                    <p>W trybie konsolowym, naszym menedżerem plików będzie <strong>ranger</strong>. Dodatkowo należy doinstalować paczkę w3m, która pozwala rangerowi wyświetlać podgląd obrazków.</p>
-                    <p><code>sudo pacman -S w3m ranger</code></p>
-                    <p>Oprócz tego, należy skopiować plik <a href="files/rc.conf">rc.conf</a> do katalogu ~/.config/ranger.</p>
+                    <span class="badge bg-secondary"><a href="files/13-4-Lf/" target=_blank>Pliki: 13-4-TextEditors</a></span>
+                    <p>W trybie konsolowym, naszym menedżerem plików będzie <strong>lf</strong>. Oprócz lf, doinstalujemy też kilkanaście paczek odpowiedzialnych za podgląd różnych rodzajów plików.</p>
+                    <p><code>yay -S lf-bin ueberzug chafa poppler ffmpegthumbnailer bc epub-thumbnailer bat catdoc docx2txt odt2txt exiftool iso-info fzf --needed</code></p>
+                    <p>Pamiętaj o skopiowaniu konfiguracji dołączonej do tego podrozdziału. Będziesz musiał też skopiować plik lfrun, który umożliwia podglądanie obrazków w oknie konsoli.</p>
                 </div>
             </section>
 
@@ -754,12 +755,7 @@
                 <h2 class="subsection-heading">13.6. Przeglądarka zdjęć</h2>
 
                 <div class="section-part">
-                    <p>Do przeglądania zdjęć użyjemy przeglądarki <strong>Viewnior</strong>.</p>
-                    <p><code>sudo pacman -S viewnior</code></p>
-                </div>
-
-                <div class="section-part">
-                    <p>W trybie konsolowym, jako przeglądarkę zdjęć będziemy używać <strong>sxiv</strong> - Simple X Image Viewer.</p>
+                    <p>Naszą przeglądarką będzie <strong>sxiv</strong> - Simple X Image Viewer.</p>
                     <p><code>sudo pacman -S sxiv</code></p>
                 </div>
             </section>
