@@ -520,20 +520,10 @@
             </section>
 
             <section class="subsection">
-                <h2 class="subsection-heading">9.4. Rofi</h2>
-                <span class="badge bg-secondary"><a href="files/9-4-Rofi/" target=_blank>Pliki: 9-4-Rofi</a></span>
-
-                <p>Następnie pobieramy program rofi, czyli główną komendę do wyświetlania różnych menu.
-                <p>Pamiętaj o skopiowaniu skoórki <strong>onedark.rasi</strong> do katalogu <strong>~/.config/rofi</strong>.</p>
-                <p><code>
-                    sudo pacman -S rofi
-                </code></p>
-            </section>
-
-            <section class="subsection">
                 <h2 class="subsection-heading">9.4. Emoji</h2>
+                <span class="badge bg-secondary"><a href="files/9-4-Emoji" target=_blank>Pliki: 9-4-Emoji</a></span>
 
-                <p>Aby działało wybieranie emoji, musimy doinstalować paczki xdotool i xsel oraz wywołać skrypt rofi-emoji.sh z opcją download.</p>
+                <p>Aby działało wybieranie emoji, musimy doinstalować paczki xdotool i xsel oraz skopiować plik <strong>emoji.txt</strong> dołączony do tego podrozdziału bezpośrednio do katalogu ~/.cache.</p>
                 <p><code>
                     sudo pacman -S xdotool xsel<br/>
                     rofi-emoji.sh --download
